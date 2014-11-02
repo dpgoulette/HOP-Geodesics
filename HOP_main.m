@@ -1,6 +1,6 @@
-% Change this line to whatever data matrix that you want to do HOP on.  The
-% matrix must be 2D or 3D data.
-Data = flatpresent;
+% Change "YourData" to whatever the name of your data matrix is.  The
+% matrix must be 2D or 3D data.  
+Data = YourData;
 
 % The following block prepares the raw data and does the hop algorithm.  It
 % also creates the max and min class structures.
