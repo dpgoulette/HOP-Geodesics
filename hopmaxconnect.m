@@ -1,4 +1,4 @@
-function maxconnect = hopmaxconnectV5(points,maxclass,hop)
+function maxconnect = hopmaxconnect(points,maxclass,hop)
 %  FIX - if two neighbor max paths have the same max-length edge, then we
 %     need to check the second longest, and then the third etc, until the tie
 %     is broken.  Currently the code only checks the longest edge.
@@ -116,6 +116,32 @@ for a=1:length(maxclass)
    end
 end
 
+%%%%%%%%% Sort the maxconnect cell contents %%%%%%%%%%
+% Sort the geodesics connected to each max; so when we are considering the
+% kth max in maxclass, the geodesics connected to k are in order from
+% shortest to longest.  
+GeoIndex = 1;
+for i = 1:length(maxclass)
+   NumMaxNeighbors = length(maxclass(i).nbormaxid);
+   temp = vertcat(maxconnect{GeoIndex:GeoIndex+NumMaxNeighbors-1,1});
+   [~,sortID] = sort(temp(:,3));
+   sortID = sortID+(GeoIndex-1);
+   maxconnect(GeoIndex:GeoIndex+NumMaxNeighbors-1,:) = ...
+               maxconnect(sortID,:);
+   GeoIndex = GeoIndex + NumMaxNeighbors;
+end
+% Now add a third column to maxconnectSort that holds the rank of the
+% geodesic in that row.  The rank is from shortest to longest.  So the
+% shortest geodesic will get a 1, the next longest a 2, etc.  This will be
+% used for the second step function in the GeodesicPlot code.
+SortTemp = vertcat(maxconnect{:,1});
+SortTemp(:,1) = 1:length(SortTemp);
+SortTemp=sortrows(SortTemp,3);
+SortTemp(1:2:end-1,2)=1:size(SortTemp,1)/2;
+SortTemp(2:2:end,2)=1:size(SortTemp,1)/2;
+SortTemp=sortrows(SortTemp,1);
+maxconnect(:,3)=num2cell(SortTemp(:,2));
+
 end% maxconnect function
 
 function L = Plength(P,X)
@@ -125,6 +151,9 @@ T = sqrt(sum(D.^2,2));
 L = max(T);
 end %Plength function
 
+%%%% Old section.  Not needed any more.  We save the hop paths when doing
+%%%% hop so we can just look this up in the data base.  No need to
+%%%% calculate it here.
 % function Path = Maxpath(p,maxpointer,Max)
 % % find the maxpath for the point p.
 %
