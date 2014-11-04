@@ -1,4 +1,4 @@
-function GoodMaxGeodesics = SelectGeodesics(maxconnect,maxclass)
+function [GoodMaxGeodesics, maxconnect] = SelectGeodesics_two_side(maxconnect,maxclass)
 %  SelectGeodesics - selects which geodesics will be included.  The
 %     function returns a vector with dimension: length(maxclass) x 1.  The
 %     ith entry in this vector is the number of geodesics connected to the
@@ -64,6 +64,28 @@ for Max = 1:length(maxclass)
       end
       [~,slot] = max(temp);
       GoodMaxGeodesics(Max) = slot;
+      % Now throw a 1 in the fourth column for each geodesic that was
+      % selected in the above process.
+      for i = GeoIndex-NumMaxNeighbors:GeoIndex-1
+         if i < GeoIndex-NumMaxNeighbors+slot
+            maxconnect{i,4} = 1;
+         else
+            maxconnect{i,4} = 0;
+         end
+      end
+   end
+end
+
+% Now find which geodesics were selected from both ends.
+temp = vertcat(maxconnect{:,1});
+temp(:,3) = [];
+for i = 1:size(maxconnect,1)
+   if (temp(i, 1) < temp(i, 2)) && maxconnect{i,4} == 1
+      b = ismember(temp, circshift(temp(i,:), [0, 1]),'rows');
+      if maxconnect{b,4} == 1 % then both ends selected this geodesic
+         maxconnect{i,4} = 2;
+         maxconnect{b,4} = 2;
+      end
    end
 end
 
