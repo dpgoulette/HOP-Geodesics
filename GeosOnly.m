@@ -1,5 +1,4 @@
-function GeosOnly(DT, GoodIndex, maxconnect, maxclass,...
-   maxindex,GoodMaxGeodesics)
+function GeosOnly(DT, GoodIndex, maxconnect, maxclass, maxindex, GoodMaxGeodesics)
 %  COMMENT THIS!!
 %
 % Loops through the maxima and plots the geodesics connected to that
@@ -46,8 +45,8 @@ P1 = plot(DT.X(GoodIndex,1),DT.X(GoodIndex,2),'k.');
 axis equal
 hold on
 axis tight
-set(DataPlot1, 'XTick', []);
-set(DataPlot1, 'YTick', []);
+set(gca, 'XTick', []);
+set(gca, 'YTick', []);
 P2 = plot(DT.X(maxindex,1),DT.X(maxindex,2),'g.');
 
 
@@ -146,10 +145,10 @@ for i=1:length(maxclass)
                GeoEdges = [GeoPath(1:end-1)', GeoPath(2:end)'];
                X=[DT.X(GeoEdges(:,1),1)';DT.X(GeoEdges(:,2),1)'];
                Y=[DT.X(GeoEdges(:,1),2)';DT.X(GeoEdges(:,2),2)'];
-               subplot(DataPlot1)
+%                subplot(DataPlot1)
                GeoPlotHandles1{j-GeoIndex+1} = plot(X,Y,'r-');
-               subplot(DataPlot2)
-               GeoPlotHandles2{j-GeoIndex+1} = plot(X,Y,'r-');
+%                subplot(DataPlot2)
+%                GeoPlotHandles2{j-GeoIndex+1} = plot(X,Y,'r-');
             end
          else % plot all geodesics
             %Plot this geodesic connected to the current max.  Plot in both
