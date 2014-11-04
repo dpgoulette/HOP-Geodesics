@@ -39,7 +39,7 @@ while true
    fprintf('Pause between maxima?\n')
    fprintf('  1) Yes\n')
    fprintf('  2) No\n')
-   pause_option = input('(Enter 1 or 2): ')
+   pause_option = input('(Enter 1 or 2): ');
    if pause_option == 1 || pause_option == 2
       break
    else
@@ -99,10 +99,7 @@ for i=1:length(maxclass)
             GeoEdges = [GeoPath(1:end-1)', GeoPath(2:end)'];
             X=[DT.X(GeoEdges(:,1),1)';DT.X(GeoEdges(:,2),1)'];
             Y=[DT.X(GeoEdges(:,1),2)';DT.X(GeoEdges(:,2),2)'];
-            subplot(DataPlot1)
             GeoPlotHandles1{j-GeoIndex+1} = plot(X,Y,'r-');
-            subplot(DataPlot2)
-            GeoPlotHandles2{j-GeoIndex+1} = plot(X,Y,'r-');
          end
          
          if pause_option == 1

@@ -35,7 +35,7 @@ function [GoodMaxGeodesics, maxconnect] = SelectGeodesics(maxconnect,maxclass)
 %
 
 % Get the plot options from the user
-fprintf('Which geodesic selection scheme do you want:\n')
+fprintf('\n\nWhich geodesic selection scheme do you want:\n')
 while true
    fprintf('    1) Longest bar from 0 to n.\n');
    fprintf('    2) Longest bar from 1 to n.\n')

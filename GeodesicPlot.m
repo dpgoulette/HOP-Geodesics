@@ -19,5 +19,5 @@ if plot_option == 1
    GeosWithStepFunc(DT,GoodIndex,maxconnect,maxclass,maxindex,GoodMaxGeodesics)
 else
    clear plot_option
-   GeosOnly(DT,GoodIndex,maxconnect,maxclass,maxindex,GoodMaxGeodesics)
+   GeosOnly(DT, GoodIndex, maxconnect, maxclass, maxindex, GoodMaxGeodesics)
 end
