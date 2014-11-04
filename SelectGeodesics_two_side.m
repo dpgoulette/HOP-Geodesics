@@ -76,6 +76,12 @@ for Max = 1:length(maxclass)
    end
 end
 
+% Issue!  How do we handle the one sided geodesics?  Currently, in a case
+% where max A and B are neighobrs and A selects their geodesic but B does
+% not, there will be a 1 in the fourth column for max A and a 0 in the
+% fourth column for max B.  If both A and B select the geodesic, then there
+% will be a 2 on both ends.
+
 % Now find which geodesics were selected from both ends.
 temp = vertcat(maxconnect{:,1});
 temp(:,3) = [];

@@ -134,9 +134,11 @@ for i=1:length(maxclass)
          
          % plot the geodesics connected to the current max.
          if plot_option == 2 %then only plot selected geodesics
-            if j-GeoIndex+1 <= GoodMaxGeodesics(i)
-               %Plot selected geodesics connected to the current max.  Plot
-               %in both the zoomed out and zoomed in plots.
+%            if j-GeoIndex+1 <= GoodMaxGeodesics(i)
+            if maxconnect{j,1}(1) < maxconnect{j,1}(2) && ...
+                  maxconnect{j,4} == 2
+               % Plot only the geodesics that are included from both ends.
+               % Plot in both the zoomed out and zoomed in plots.
                GeoPath = maxconnect{j,2};
                GeoEdges = [GeoPath(1:end-1)', GeoPath(2:end)'];
                X=[DT.X(GeoEdges(:,1),1)';DT.X(GeoEdges(:,2),1)'];
