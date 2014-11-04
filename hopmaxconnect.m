@@ -23,8 +23,6 @@ function maxconnect = hopmaxconnect(points,maxclass,hop)
 %       and minimizes the length of the longest edge. The geodesics between
 %       each pair of neigboring maxima are stored in the maxconnect data
 %       struct.
-%
-%
 
 %this counts the number of geodesics we will need to store so we can
 %preallocate the maxconnect cell.
@@ -39,7 +37,7 @@ k=1;
 
 for a=1:length(maxclass)
    %the next if statement guards against the case where a max class is
-   %isolated (rare artifact on the boundary of the max class).
+   %isolated (rare artifact on the boundary of the data).
    if ~isempty(maxclass(a).bonds)
       B=maxclass(a).bonds;%B holds the bonds of maxclass a
       for b=1:size(maxclass(a).nbormaxid,1)
