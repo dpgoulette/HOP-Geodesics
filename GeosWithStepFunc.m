@@ -23,6 +23,8 @@ while a==0
       fprintf('\nERROR: You must enter 1 or 2.\n')
    end
 end
+fprintf('\n')
+fprintf('\n')
 
 while a==1
    fprintf('Do you want the geodesics to be deleted after each iteration? ')
