@@ -7,34 +7,30 @@ function GeosWithStepFunc(DT, GoodIndex, maxconnect, maxclass,...
 
 
 % Get the plot options from the user
-a=0;
-while a==0
-   fprintf('This function loops through each HOP max and plots the geodesics ')
-   fprintf('connected to it.  Do you want to see all geodesics attached to ')
-   fprintf('each max? Or do you only want to see the geodesics that were ')
-   fprintf('selected by the SelectGeodesics function?\n\n')
-   fprintf('Select one of the following:\n')
-   fprintf('    1) Plot every geodesic connected to each max.\n');
-   fprintf('    2) Only plot the selected geodesics.\n')
+fprintf('This function loops through each hop max and plots the geodesics ')
+fprintf('connected to it.  It can plot all geodesics attached to each max.')
+fprintf('Or it can plot only the geodesics that were selected.\n\n')
+fprintf('Which do you want to see:\n')
+while true
+   fprintf('    1) Every geodesic.\n');
+   fprintf('    2) Selected geodesics.\n')
    plot_option = input('Which of the above options do you prefer: ');
    if plot_option==1 || plot_option==2 
-      a=1;
+      break
    else
       fprintf('\nERROR: You must enter 1 or 2.\n')
    end
 end
 fprintf('\n')
-fprintf('\n')
-
-while a==1
-   fprintf('Do you want the geodesics to be deleted after each iteration? ')
-   fprintf('Or do you want the geodesics to aggregate as you go?\n')
-   fprintf('Select one of the following:\n')
+fprintf('The geodesics can be deleted after each iteration or they ')
+fprintf('can aggregate.\n\n')
+fprintf('Which do you prefer:\n')
+while true
    fprintf('    1) Delete geodesics after each iteration.\n');
    fprintf('    2) Aggregate the geodesics.\n')
    delete_option = input('Which of the above options do you prefer: ');
    if delete_option == 1 || delete_option == 2 
-      a=2;
+      break
    else
       fprintf('\nERROR: You must enter 1 or 2.\n')
    end
