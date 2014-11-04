@@ -1,4 +1,5 @@
-function GeodesicPlot(DT,GoodIndex,maxconnect,maxclass,maxindex,GoodMaxGeodesics)
+function GeodesicPlotWithStep(DT, GoodIndex, maxconnect, maxclass,...
+   maxindex,GoodMaxGeodesics)
 %  COMMENT THIS!!
 %
 % Loops through the maxima and plots the geodesics connected to that
