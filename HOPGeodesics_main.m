@@ -4,12 +4,26 @@
 load('FlatDataExample.txt')
 Data = FlatDataExample;
 
-% The following block prepares the raw data and does the hop algorithm.  It
-% also creates the max and min class structures.
+% Prepare the raw data for HOP. Calculate the Delaunay triangulation, the
+% Voroinoi diagram, throw away "bad" data on the boundary of the data
+% space, etc.
 [DT,VV,VC,BadDataID,DTedges,GoodIndex,GoodEdges] = HOPDataPrepare(Data);
+% Now create the hop data structure and create the path pointer that will
+% be used to do hop. Locate all of the hop maxima and minima. etc.
 [hop, maxindex, minindex] = HOPStructCreate(VV,VC,GoodEdges,GoodIndex,DT);
+% Now create the maxclass and minclass structure which holds all of the
+% information for each hop max/min class.
 [hop,maxclass,minclass] = HOPClasses(hop,maxindex,minindex,DT);
+
+% Geodesic triangle function should go here.  We need maxclass to do it.
+% The function should locate all maxclass triangles and create a geodesic
+% triangle structure.
+
+% Calculate all of the geodesics connecting neighboring max classes.  Store
+% the results in the maxclass cell.
 maxconnect = hopmaxconnect(DT.X,maxclass,hop);
+
+% Select the geodesics that we will keep and which we will throw out.
 [GoodMaxGeodesics, maxconnect] = SelectGeodesics(maxconnect,maxclass);
 
 fprintf('\nDo you want to plot the results? \n');
