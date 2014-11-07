@@ -17,16 +17,21 @@ fprintf('\nDone making Delaunay and Voronoi which took this long:\n')
 toc
 fprintf('\n')
 
-%We need to remove any data point that has a voronoi cell that goes to
-%infinity.  That is, we need to find any vertex that references a bad
-%Voronoi vertex.  Infinity is bad.  Also any voronoi vertex outside of the
-%data space.  Any finite voronoi vertex that is outside of the dataspace
-%will not be inside any Delaunay tetra. delaunay tetra.
+% In our work we choose to remove data that is on the boundary of the data
+% space.  We do this by removing any data point that has a voronoi cell
+% vertex which we deem to be a "bad Voronoi vertex."  We also remove any
+% Infinity is bad because any voronoi cell atteched to it has infinite
+% area/volume.  Also any voronoi vertex outside of the data space is bad
+% because they are often artificially elongated, thus the voronoi cell is
+% less reliable.
 
-%find the indices of the bad Voronoi vertices.  pointLocation returns a nan
-%if the voronoi vertex is NOT interior to any triangle/tetra.  We put a NaN
-%in the first slot because the point at infinity is listed first in the
-%Voronoi diagram.
+% Note, any finite voronoi vertex that is outside of the dataspace
+% will not be inside any Delaunay tetra.
+
+% find the indices of the bad Voronoi vertices.  pointLocation returns a nan
+% if the voronoi vertex is NOT interior to any triangle/tetra.  We put a NaN
+% in the first slot because the point at infinity is listed first in the
+% Voronoi diagram.
 ID = [NaN; pointLocation(DT,VV(2:length(VV),:))];
 BadVV = find(isnan(ID));%creates index vector of bad vor verts
 
