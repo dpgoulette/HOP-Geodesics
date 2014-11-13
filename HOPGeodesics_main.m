@@ -1,8 +1,13 @@
 % Change the first line in the script so that the "Data" variable holds
 % whatever the name of your data matrix is.  The matrix must be 2D or 3D
 % data.  
+
 load('FlatDataExample.txt')
 Data = FlatDataExample;
+ 
+% load('Test1.txt')
+% Data = Test1;
+
 
 % Prepare the raw data for HOP. Calculate the Delaunay triangulation, the
 % Voroinoi diagram, throw away "bad" data on the boundary of the data
@@ -37,6 +42,7 @@ while true
    elseif plot_option == 1
       clear plot_option
       run('GeodesicPlot')
+      break
    else
       fprintf('ERROR! You must enter 1 or 2.\n\n')
    end
