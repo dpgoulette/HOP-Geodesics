@@ -2,12 +2,14 @@
 % whatever the name of your data matrix is.  The matrix must be 2D or 3D
 % data.  
 
-load('FlatDataExample.txt')
-Data = FlatDataExample;
- 
-% load('Test1.txt')
-% Data = Test1;
+% Data = load('FlatDataExample.txt')
 
+while true
+   fprintf('\nWhat data file would you like to study?\n')
+   NameString = input('Enter the name of the file in single quotes including the file extension: ');
+   Data = load(NameString);
+   break
+end
 
 % Prepare the raw data for HOP. Calculate the Delaunay triangulation, the
 % Voroinoi diagram, throw away "bad" data on the boundary of the data
