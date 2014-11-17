@@ -86,7 +86,7 @@ for a=1:length(maxclass)
                   %same as for P1 above.
                   P2 = temp(c,2);
                end
-                           
+               
                Paths{c}=[fliplr(P1), P2];
                %now find the euclidean length of the longest edge in
                %the path from max to max.
@@ -117,16 +117,18 @@ end
 %%%%%%%%% Sort the maxconnect cell contents %%%%%%%%%%
 % Sort the geodesics connected to each max; so when we are considering the
 % kth max in maxclass, the geodesics connected to k are in order from
-% shortest to longest.  
+% shortest to longest.
 GeoIndex = 1;
 for i = 1:length(maxclass)
-   NumMaxNeighbors = length(maxclass(i).nbormaxid);
-   temp = vertcat(maxconnect{GeoIndex:GeoIndex+NumMaxNeighbors-1,1});
-   [~,sortID] = sort(temp(:,3));
-   sortID = sortID+(GeoIndex-1);
-   maxconnect(GeoIndex:GeoIndex+NumMaxNeighbors-1,:) = ...
-               maxconnect(sortID,:);
-   GeoIndex = GeoIndex + NumMaxNeighbors;
+   if ~isempty(maxclass(i).nbormax)
+      NumMaxNeighbors = length(maxclass(i).nbormaxid);
+      temp = vertcat(maxconnect{GeoIndex:GeoIndex+NumMaxNeighbors-1,1});
+      [~,sortID] = sort(temp(:,3));
+      sortID = sortID+(GeoIndex-1);
+      maxconnect(GeoIndex:GeoIndex+NumMaxNeighbors-1,:) = ...
+         maxconnect(sortID,:);
+      GeoIndex = GeoIndex + NumMaxNeighbors;
+   end
 end
 % Now add a third column to maxconnectSort that holds the rank of the
 % geodesic in that row.  The rank is from shortest to longest.  So the

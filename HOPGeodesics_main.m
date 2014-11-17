@@ -5,11 +5,29 @@
 % Data = load('FlatDataExample.txt')
 
 while true
-   fprintf('\nWhat data file would you like to study?\n')
-   NameString = input('Enter the name of the file in single quotes including the file extension: ');
+   fprintf('\nEnter the name of the file you wish to study in single quotes\n')
+   NameString = input('including the file extension: ');
    Data = load(NameString);
+   clear NameString
    break
 end
+
+%%%%POSSIBLY DELETE THIS%%%%
+% % User selects whether they want to hop on the complete Delaunay or an
+% % alpha complex (subset of Delaunay).
+% fprintf('Would you like to HOP on the full Delaunay or the 1-skeleton\n')
+% fprintf('of an alpha complex?\n')
+% while true
+%    fprintf('   1) HOP on full Delaunay.\n')
+%    fprintf('   2) HOP on alpha complex.\n')
+%    alpha_option = input('Choose one of the above: ');
+%    if alpha_option == 2 || alpha_option == 1
+%       break
+%    else
+%       fprintf('ERROR! You must enter 1 or 2.\n\n')
+%    end
+% end
+
 
 % Prepare the raw data for HOP. Calculate the Delaunay triangulation, the
 % Voroinoi diagram, throw away "bad" data on the boundary of the data
@@ -17,7 +35,7 @@ end
 [DT,VV,VC,BadDataID,DTedges,GoodIndex,GoodEdges] = HOPDataPrepare(Data);
 % Now create the hop data structure and create the path pointer that will
 % be used to do hop. Locate all of the hop maxima and minima. etc.
-[hop, maxindex, minindex] = HOPStructCreate(VV,VC,GoodEdges,GoodIndex,DT);
+[hop, maxindex, minindex] = HOPStructCreate_edit(VV,VC,GoodEdges,GoodIndex,DT);
 % Now create the maxclass and minclass structure which holds all of the
 % information for each hop max/min class.
 [hop,maxclass,minclass] = HOPClasses(hop,maxindex,minindex,DT);

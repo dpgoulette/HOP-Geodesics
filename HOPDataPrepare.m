@@ -1,10 +1,10 @@
 function [DT,VV,VC,BadDataID,DTedges,GoodIndex,...
-                            GoodEdges] = HOPDataPrepare(Data)
+   GoodEdges] = HOPDataPrepare(Data)
 % comment this and clean the rest up
 
 %Error check.  Make sure the data is 2d or 3d
 if size(Data,2) < 2 || size(Data,2) > 3
-    error('The data must be an Nx2 matrix of points or an Nx3 matrix.')
+   error('The data must be an Nx2 matrix of points or an Nx3 matrix.')
 end
 
 %Create the delaunay triangulation object and the voronoi cell data.
@@ -35,16 +35,16 @@ fprintf('\n')
 ID = [NaN; pointLocation(DT,VV(2:length(VV),:))];
 BadVV = find(isnan(ID));%creates index vector of bad vor verts
 
-%Now we find the bad data.  "Bad data" is on the boundary of the data space
-%so it has ind the vertices in the data that have a voronoi cell which
-%includes a bad voronoi vertex.  Create an index of "BadDataID."
+% Now we find the bad data.  "Bad data" is on the boundary of the data space
+% so it has a voronoi cell which includes a bad voronoi vertex.  Create an
+% index of "BadDataID."
 BadDataID = zeros(length(DT.X),1);
 a=1;
 for b=1:length(VC)
-    if ~isempty(intersect(BadVV,VC{b}))
-        BadDataID(a)=b;
-        a=a+1;
-    end
+   if ~isempty(intersect(BadVV,VC{b}))
+      BadDataID(a)=b;
+      a=a+1;
+   end
 end
 BadDataID(BadDataID==0)=[];
 
@@ -61,16 +61,49 @@ R=unique(R);
 GoodEdges=DTedges;
 GoodEdges(R,:)=[];%delete the bad edges.
 
-%Here is the Good data if you want it. 
-Good=Data;
-Good(BadDataID,:)=[];
+%%%% DISABLED. NOT NEEDED %%%%%%
+% %Here is the Good data if you want it.
+% Good=Data;
+% Good(BadDataID,:)=[];
 
-%Index of the good data if you want it.
+% User selects whether they want to hop on the complete Delaunay or an
+% alpha complex (subset of Delaunay).
+fprintf('Would you like to HOP on the full Delaunay 1-skeleton, or the\n')
+fprintf('1-skeleton of an alpha complex?\n')
+while true
+   fprintf('   1) HOP on full Delaunay.\n')
+   fprintf('   2) HOP on alpha complex.\n')
+   alpha_option = input('Choose one of the above: ');
+   if alpha_option == 2 || alpha_option == 1
+      break
+   else
+      fprintf('ERROR! You must enter 1 or 2.\n\n')
+   end
+end
+fprintf('\n')
+if alpha_option == 1
+   % We are done.
+   fprintf('Finished the initial prep of the data.\n')
+   fprintf('Found the good data and the good edges.\n')
+else % HOP on an alpha complex 1-skeleton
+   if size(Data,2) == 2
+      % then Data is 2D
+      GoodEdges = AlphaCellsSelect2D(DT,GoodEdges,VV,VC);
+   else
+      % Data is 3D
+      GoodEdges = AlphaCellsSelect3D(DT.GoodEdges,VV,VC);
+   end
+end
+
+%Index of the good data which is required for later 
 GoodIndex=unique(GoodEdges);
 
-fprintf('Finished the initial prep of the data.\n')
-fprintf('Found the good data and the good edges.\n')
+end % main function HOPDataPrepare
 
-end%function
+
+
+%%%%% Now the 3D alpha selection function %%%%%
+
+
 
 

@@ -35,6 +35,18 @@ while true
       fprintf('\nERROR: You must enter 1 or 2.\n')
    end
 end
+fprintf('\n')
+while true
+   fprintf('Would you like to see the HOP trees?\n')
+   fprintf('  1) Yes\n')
+   fprintf('  2) No\n')
+   tree_option = input('(Enter 1 or 2): ');
+   if tree_option == 1 || tree_option == 2
+      break
+   else
+      fprintf('\nERROR: You must enter 1 or 2.\n')
+   end
+end
 
 figure
 % force the subplot to be in a certain position.  The position vector is 
@@ -46,6 +58,12 @@ hold on
 axis tight
 set(DataPlot1, 'XTick', []);
 set(DataPlot1, 'YTick', []);
+if tree_option == 1
+   E = vertcat(maxclass.hoptree);
+   X=[DT.X(E(:,1),1)';DT.X(E(:,2),1)'];
+   Y=[DT.X(E(:,1),2)';DT.X(E(:,2),2)'];
+   hoptree_plot = plot(X,Y,'b:');
+end
 P2 = plot(DT.X(maxindex,1),DT.X(maxindex,2),'g.');
 
 
@@ -56,6 +74,12 @@ hold on
 % axis tight
 set(DataPlot2, 'XTick', []);
 set(DataPlot2, 'YTick', []);
+if tree_option == 1
+   E = vertcat(maxclass.hoptree);
+   X=[DT.X(E(:,1),1)';DT.X(E(:,2),1)'];
+   Y=[DT.X(E(:,1),2)';DT.X(E(:,2),2)'];
+   hoptree_plot = plot(X,Y,'b:');
+end
 P4 = plot(DT.X(maxindex,1),DT.X(maxindex,2),'g.');
 
 BarCode1 = subplot('Position',[0.575, 0.537, 0.4, 0.4]);

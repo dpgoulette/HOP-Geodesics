@@ -1,5 +1,10 @@
-function GeosOnly(DT, GoodIndex, maxconnect, maxclass, maxindex, GoodMaxGeodesics)
+function GeosOnly(DT, GoodIndex, maxconnect, maxclass, maxindex,...
+   GoodMaxGeodesics, pause_option)
 %  COMMENT THIS!!
+%
+%  GoodMaxGeodesics is unused and may be unneeded.  It comes from
+%  SelectGeodesics.  Consider renaming it to: num_selected_geos (or
+%  something like that)
 %
 % Loops through the maxima and plots the geodesics connected to that
 % particular max along with the persistence diagrams.
@@ -20,40 +25,67 @@ while true
       fprintf('\nERROR: You must enter 1 or 2.\n')
    end
 end
-fprintf('\n')
-fprintf('The geodesics can be deleted after each iteration or they ')
-fprintf('can aggregate.\n\n')
-fprintf('Which do you prefer:\n')
-while true
-   fprintf('    1) Delete geodesics after each iteration.\n');
-   fprintf('    2) Aggregate the geodesics.\n')
-   delete_option = input('Which of the above options do you prefer: ');
-   if delete_option == 1 || delete_option == 2
-      break
-   else
-      fprintf('\nERROR: You must enter 1 or 2.\n')
+
+% while true
+%    fprintf('Pause between maxima?\n')
+%    fprintf('  1) Yes\n')
+%    fprintf('  2) No\n')
+%    pause_option = input('(Enter 1 or 2): ');
+%    if pause_option == 1 || pause_option == 2
+%       break
+%    else
+%       fprintf('\nERROR: You must enter 1 or 2.\n')
+%    end
+% end
+% fprintf('\n')
+
+if pause_option == 1
+   fprintf('\n')
+   fprintf('The geodesics can be deleted after each iteration or they ')
+   fprintf('can aggregate.\n\n')
+   fprintf('Which do you prefer:\n')
+   while true
+      fprintf('    1) Delete geodesics after each iteration.\n');
+      fprintf('    2) Aggregate the geodesics.\n')
+      delete_option = input('Which of the above options do you prefer: ');
+      if delete_option == 1 || delete_option == 2
+         break
+      else
+         fprintf('\nERROR: You must enter 1 or 2.\n')
+      end
    end
+else
+   delete_option = 2;
 end
 fprintf('\n')
+
 while true
-   fprintf('Pause between maxima?\n')
+   fprintf('Would you like to see the HOP trees?\n')
    fprintf('  1) Yes\n')
    fprintf('  2) No\n')
-   pause_option = input('(Enter 1 or 2): ');
-   if pause_option == 1 || pause_option == 2
+   tree_option = input('(Enter 1 or 2): ');
+   if tree_option == 1 || tree_option == 2
       break
    else
       fprintf('\nERROR: You must enter 1 or 2.\n')
    end
 end
 
-P1 = plot(DT.X(GoodIndex,1),DT.X(GoodIndex,2),'k.');
+points_plot = plot(DT.X(GoodIndex,1),DT.X(GoodIndex,2),'k.');
 axis equal
 hold on
 axis tight
 set(gca, 'XTick', []);
 set(gca, 'YTick', []);
-P2 = plot(DT.X(maxindex,1),DT.X(maxindex,2),'g.');
+
+if tree_option == 1
+   E = vertcat(maxclass.hoptree);
+   X=[DT.X(E(:,1),1)';DT.X(E(:,2),1)'];
+   Y=[DT.X(E(:,1),2)';DT.X(E(:,2),2)'];
+   hoptree_plot = plot(X,Y,'b:');
+end
+
+maxima_plot = plot(DT.X(maxindex,1),DT.X(maxindex,2),'g.');
 
 
 GeoIndex = 1;
