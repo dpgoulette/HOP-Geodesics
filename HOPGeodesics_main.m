@@ -35,7 +35,7 @@ end
 [DT,VV,VC,BadDataID,DTedges,GoodIndex,GoodEdges] = HOPDataPrepare(Data);
 % Now create the hop data structure and create the path pointer that will
 % be used to do hop. Locate all of the hop maxima and minima. etc.
-[hop, maxindex, minindex] = HOPStructCreate_edit(VV,VC,GoodEdges,GoodIndex,DT);
+[hop, maxindex, minindex] = HOPStructCreate(VV,VC,GoodEdges,GoodIndex,DT);
 % Now create the maxclass and minclass structure which holds all of the
 % information for each hop max/min class.
 [hop,maxclass,minclass] = HOPClasses(hop,maxindex,minindex,DT);
