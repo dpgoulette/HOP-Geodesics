@@ -12,30 +12,50 @@ while true
    break
 end
 
-%%%%POSSIBLY DELETE THIS%%%%
-% % User selects whether they want to hop on the complete Delaunay or an
-% % alpha complex (subset of Delaunay).
-% fprintf('Would you like to HOP on the full Delaunay or the 1-skeleton\n')
-% fprintf('of an alpha complex?\n')
-% while true
-%    fprintf('   1) HOP on full Delaunay.\n')
-%    fprintf('   2) HOP on alpha complex.\n')
-%    alpha_option = input('Choose one of the above: ');
-%    if alpha_option == 2 || alpha_option == 1
-%       break
-%    else
-%       fprintf('ERROR! You must enter 1 or 2.\n\n')
-%    end
-% end
-
-
 % Prepare the raw data for HOP. Calculate the Delaunay triangulation, the
 % Voroinoi diagram, throw away "bad" data on the boundary of the data
 % space, etc.
-[DT,VV,VC,BadDataID,DTedges,GoodIndex,GoodEdges] = HOPDataPrepare(Data);
+% NOTE!!  The "GoodEdges" matrix that is returned here may be altered if
+% the user chooses to HOP on an alpha complex instead of the full delaunay.
+[DT,VV,VC,BadDataID,DTedges,GoodEdges,GoodIndex] = HOPDataPrepare(Data);
+
+% User selects whether they want to hop on the complete Delaunay or an
+% alpha complex (subset of Delaunay).
+fprintf('Would you like to HOP on the full Delaunay 1-skeleton, or the\n')
+fprintf('1-skeleton of an alpha complex?\n')
+while true
+   fprintf('   1) HOP on full Delaunay.\n')
+   fprintf('   2) HOP on alpha complex.\n')
+   alpha_option = input('Choose one of the above: ');
+   if alpha_option == 2 || alpha_option == 1
+      break
+   else
+      fprintf('ERROR! You must enter 1 or 2.\n\n')
+   end
+end
+fprintf('\n')
+if alpha_option == 1
+   % We are done.
+   clear alpha_option
+   fprintf('Finished the initial prep of the data.\n')
+else % HOP on an alpha complex 1-skeleton
+   if size(Data,2) == 2
+      % then Data is 2D
+      clear alpha_option
+      [GoodEdges,one_cells] = AlphaCellsSelect2D(DT,GoodEdges,VV,VC,GoodIndex);
+      fprintf('\nFinished selecting the alpha complex\n')
+   else
+      % Data is 3D
+      clear alpha_option
+      GoodEdges = AlphaCellsSelect3D(DT.GoodEdges,VV,VC,GoodIndex);
+      fprintf('\nFinished selecting the alpha complex\n')
+   end
+end
+
 % Now create the hop data structure and create the path pointer that will
 % be used to do hop. Locate all of the hop maxima and minima. etc.
 [hop, maxindex, minindex] = HOPStructCreate(VV,VC,GoodEdges,GoodIndex,DT);
+
 % Now create the maxclass and minclass structure which holds all of the
 % information for each hop max/min class.
 [hop,maxclass,minclass] = HOPClasses(hop,maxindex,minindex,DT);
