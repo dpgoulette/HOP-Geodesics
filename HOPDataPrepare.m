@@ -1,5 +1,4 @@
-function [DT,VV,VC,BadDataID,DTedges,GoodIndex,...
-   GoodEdges] = HOPDataPrepare(Data)
+function [DT,VV,VC,BadDataID,DTedges,GoodEdges,GoodIndex] = HOPDataPrepare(Data)
 % comment this and clean the rest up
 
 %Error check.  Make sure the data is 2d or 3d
@@ -61,49 +60,13 @@ R=unique(R);
 GoodEdges=DTedges;
 GoodEdges(R,:)=[];%delete the bad edges.
 
+GoodIndex=unique(GoodEdges);
+
 %%%% DISABLED. NOT NEEDED %%%%%%
 % %Here is the Good data if you want it.
 % Good=Data;
 % Good(BadDataID,:)=[];
 
-% User selects whether they want to hop on the complete Delaunay or an
-% alpha complex (subset of Delaunay).
-fprintf('Would you like to HOP on the full Delaunay 1-skeleton, or the\n')
-fprintf('1-skeleton of an alpha complex?\n')
-while true
-   fprintf('   1) HOP on full Delaunay.\n')
-   fprintf('   2) HOP on alpha complex.\n')
-   alpha_option = input('Choose one of the above: ');
-   if alpha_option == 2 || alpha_option == 1
-      break
-   else
-      fprintf('ERROR! You must enter 1 or 2.\n\n')
-   end
-end
-fprintf('\n')
-if alpha_option == 1
-   % We are done.
-   fprintf('Finished the initial prep of the data.\n')
-   fprintf('Found the good data and the good edges.\n')
-else % HOP on an alpha complex 1-skeleton
-   if size(Data,2) == 2
-      % then Data is 2D
-      GoodEdges = AlphaCellsSelect2D(DT,GoodEdges,VV,VC);
-   else
-      % Data is 3D
-      GoodEdges = AlphaCellsSelect3D(DT.GoodEdges,VV,VC);
-   end
-end
-
-%Index of the good data which is required for later 
-GoodIndex=unique(GoodEdges);
-
 end % main function HOPDataPrepare
-
-
-
-%%%%% Now the 3D alpha selection function %%%%%
-
-
 
 
