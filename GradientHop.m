@@ -20,6 +20,10 @@ function [maxpointer, minpointer, hop] = GradientHop(hop,GoodIndex,DT)
 maxpointer=NaN(length(DT.X),1);
 minpointer=NaN(length(DT.X),1);
 
+% Initialize each point as not being a max or a min.
+[hop(:).ismax]=deal(false);
+[hop(:).ismin]=deal(false);
+
 %find maximums; A max has density larger than any of it's neigbors. mark in
 %hop struct which points are maxs; create pointer list for the HOP paths;
 %there will be a NaN at an entry for a bad point. There will be an Inf if
@@ -52,7 +56,13 @@ for i=1:length(GoodIndex)
     %Now find the positive gradient neighbor and catalog in pointer vector.
     [DeltaMax, DeltaMaxID] = max(Deltas);%Max Delta with Index
     
-    if DeltaMax <= 0 
+    % Now catalog whether each point is a max or not and store it in the
+    % hop data structure.  If hop is done on an alpha complex then some
+    % points may have no edges attached to them so in this case DeltaMax is
+    % empty and the point is a max AND a min by definition.  If DeltaMax is
+    % negative then all neighbors have negative gradient, so the point is a
+    % max.
+    if isempty(DeltaMax) || DeltaMax <= 0 
         %then GoodIndex(i) is a max
         hop(GoodIndex(i)).ismax = true;
         maxpointer(GoodIndex(i))=Inf;
@@ -64,7 +74,7 @@ for i=1:length(GoodIndex)
     %Now do the negative gradient neighbor for HOP to the mins
     [DeltaMin, DeltaMinID] = min(Deltas);
     
-    if DeltaMin >= 0
+    if isempty(DeltaMin) || DeltaMin >= 0
         %then GoodIndex(i) is a min
         hop(GoodIndex(i)).ismin = true;
         minpointer(GoodIndex(i)) = Inf;

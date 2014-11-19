@@ -1,4 +1,4 @@
-function [hop, maxindex, minindex] = HOPStructCreate_edit(VV,VC,GoodEdges,...
+function [hop, maxindex, minindex] = HOPStructCreate(VV,VC,GoodEdges,...
    GoodIndex,DT)
 % Fix the comments for this function!!!
 %
@@ -66,9 +66,12 @@ Edges(:,3) = Densities(Edges(:,2));
 
 tic
 fprintf('Starting to sort the edges for HOP.  This may take a while.\n')
+
 % deal the edges connected to each vertex to the structure. They will be
 % sorted later. We only catalog edges that are attached to "good" points,
-% hence the need to use the "GoodIndex" vector.
+% hence the need to use the "GoodIndex" vector.  Also, we sort the edges
+% based on the density of the neighbor which is in the third column of the
+% edges matrix.
 for a=1:length(GoodIndex)
    r=Edges(:,1)==GoodIndex(a);
    hop(GoodIndex(a)).edges=sortrows(Edges(r,:),3);
@@ -78,11 +81,11 @@ fprintf('Finished sorting the hop edges into the hop data struct.\n')
 toc
 fprintf('\n')
 
-for a = 1:length(hop)
-   if ~isempty(hop(a).edges)
-      hop(a).density = Densities(a);
-   end
+% Catalog the density of each good point
+for a = 1:length(GoodIndex)
+   hop(GoodIndex(a)).density = Densities(GoodIndex(a));
 end
+
 fprintf('The densities are now cataloged in the hop data structure.\n')
 toc
 
@@ -145,9 +148,6 @@ if density_option == 2
    end
 end % alternate density function section
 % Done calculating the density of each point.  Ready for HOP
-
-[hop(:).ismax]=deal(false);
-[hop(:).ismin]=deal(false);
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % %               HOP SECTION

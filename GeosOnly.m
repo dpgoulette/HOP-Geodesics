@@ -71,6 +71,7 @@ while true
    end
 end
 
+figure
 points_plot = plot(DT.X(GoodIndex,1),DT.X(GoodIndex,2),'k.');
 axis equal
 hold on

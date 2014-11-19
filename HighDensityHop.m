@@ -19,12 +19,18 @@ function [maxpointer, minpointer, hop] = HighDensityHop(hop,GoodIndex,DT)
 maxpointer=NaN(length(DT.X),1);
 minpointer=NaN(length(DT.X),1);
 
+[hop(:).ismax]=deal(false);
+[hop(:).ismin]=deal(false);
+
 %find maximums; A max has density larger than any of it's neigbors. mark in
 %hop struct which points are maxs; create pointer list for the HOP paths;
 %there will be a NaN at an entry for a bad point. There will be an Inf if
-%the point is a max.
+%the point is a max.  Note that if we do hop on an alpha complex, then some
+%good points have no edges attached to them.  Thus they are maxima AND
+%minima by definition.
 for z=1:length(GoodIndex)
-    if hop(GoodIndex(z)).edges(end,3)<hop(GoodIndex(z)).density
+    if isempty(hop(GoodIndex(z)).edges) || ...
+          hop(GoodIndex(z)).edges(end,3)<hop(GoodIndex(z)).density
         %GoodIndex(z) is a max
         hop(GoodIndex(z)).ismax = true;
         maxpointer(GoodIndex(z))=Inf;
@@ -36,7 +42,8 @@ end
 %find minimums;mark in hop struct;create pointer list; there will be a NaN
 %at an entry for a bad point.  There will be an Inf if the point is a min.
 for z=1:length(GoodIndex)
-    if hop(GoodIndex(z)).edges(1,3)>hop(GoodIndex(z)).density
+    if isempty(hop(GoodIndex(z)).edges) || ...
+          hop(GoodIndex(z)).edges(1,3)>hop(GoodIndex(z)).density
         %GoodIndex(z) is a min
         hop(GoodIndex(z)).ismin = true;
         minpointer(GoodIndex(z))=Inf;
