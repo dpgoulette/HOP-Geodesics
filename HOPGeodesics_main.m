@@ -69,7 +69,7 @@ end
 [hop,maxclass,minclass] = HOPClasses(hop,maxindex,minindex,DT);
 
 % Geodesic triangle function should go here.  We need maxclass to do it.
-% The function should locate all maxclass triangles and create a geodesic
+% The function should locate ALL maxclass triangles and create a geodesic
 % triangle structure.
 
 % Calculate all of the geodesics connecting neighboring max classes.  Store
