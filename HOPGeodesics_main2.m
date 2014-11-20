@@ -1,9 +1,14 @@
 function [hop,maxclass,minclass,maxconnect,one_cells] =...
    HOPGeodesics_main2(DataFileString)
-
-% Change the first line in the script so that the "Data" variable holds
-% whatever the name of your data matrix is.  The matrix must be 2D or 3D
-% data.
+% input - the full name of the file you want to analyze as a string.  Make
+%         sure to include the file extension.  e.g. 'FlatDataExample.txt'
+%
+% output - HOP results in our data structures.  
+%
+%     This function is for testing and visualizing the results for
+%     different choices.  You will be asked various questions at the
+%     command window.  Even when plots pop up, the program is still
+%     running.  So return to the command window for more options.
 
 if ~ischar(DataFileString)
    error('Your input is not a string. It needs to be a file string')
