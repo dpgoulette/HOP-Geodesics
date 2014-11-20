@@ -1,4 +1,4 @@
-function [DT,VV,VC,BadDataID,DTedges,GoodEdges,GoodIndex] = HOPDataPrepare(Data)
+function [DT,VV,VC,BadDataID,DTedges] = HOPDataPrepare(Data)
 % comment this and clean the rest up
 
 %Error check.  Make sure the data is 2d or 3d
@@ -54,13 +54,13 @@ BadDataID(BadDataID==0)=[];
 %get ALL edges (including bad ones)
 DTedges=edges(DT);
 
-%now remove bad edges.  They are "bad" if they contain a bad data point.
-[R,~]=find(ismember(DTedges,BadDataID));
-R=unique(R);
-GoodEdges=DTedges;
-GoodEdges(R,:)=[];%delete the bad edges.
-
-GoodIndex=unique(GoodEdges);
+% %now remove bad edges.  They are "bad" if they contain a bad data point.
+% [R,~]=find(ismember(DTedges,BadDataID));
+% R=unique(R);
+% GoodEdges=DTedges;
+% GoodEdges(R,:)=[];%delete the bad edges.
+% 
+% GoodIndex=unique(GoodEdges);
 
 %%%% DISABLED. NOT NEEDED %%%%%%
 % %Here is the Good data if you want it.

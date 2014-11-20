@@ -1,6 +1,6 @@
 % Change the first line in the script so that the "Data" variable holds
 % whatever the name of your data matrix is.  The matrix must be 2D or 3D
-% data.  
+% data.
 
 % Data = load('FlatDataExample.txt')
 
@@ -17,7 +17,15 @@ end
 % space, etc.
 % NOTE!!  The "GoodEdges" matrix that is returned here may be altered if
 % the user chooses to HOP on an alpha complex instead of the full delaunay.
-[DT,VV,VC,BadDataID,DTedges,GoodEdges,GoodIndex] = HOPDataPrepare(Data);
+[DT,VV,VC,BadDataID,DTedges] = HOPDataPrepare(Data);
+
+%now remove bad edges.  They are "bad" if they contain a bad data point.
+[R,~]=find(ismember(DTedges,BadDataID));
+R=unique(R);
+GoodEdges=DTedges;
+GoodEdges(R,:)=[];%delete the bad edges.
+GoodIndex=unique(GoodEdges);
+clear R
 
 % User selects whether they want to hop on the complete Delaunay or an
 % alpha complex (subset of Delaunay).
@@ -61,7 +69,7 @@ end
 [hop,maxclass,minclass] = HOPClasses(hop,maxindex,minindex,DT);
 
 % Geodesic triangle function should go here.  We need maxclass to do it.
-% The function should locate all maxclass triangles and create a geodesic
+% The function should locate ALL maxclass triangles and create a geodesic
 % triangle structure.
 
 % Calculate all of the geodesics connecting neighboring max classes.  Store
