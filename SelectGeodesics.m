@@ -1,4 +1,5 @@
-function [GoodMaxGeodesics, maxconnect] = SelectGeodesics(maxconnect,maxclass)
+function [GoodMaxGeodesics, maxconnect, maxclass] =...
+                        SelectGeodesics(maxconnect,maxclass)
 % Fix the comments!
 %    Need:
 %        1) Pick the longest bar from 0 to n
@@ -38,9 +39,10 @@ function [GoodMaxGeodesics, maxconnect] = SelectGeodesics(maxconnect,maxclass)
 fprintf('\n\nWhich geodesic selection scheme do you want:\n')
 while true
    fprintf('    1) Longest bar from 0 to n.\n');
-   fprintf('    2) Longest bar from 1 to n.\n')
+   fprintf('    2) Longest bar from 1 to n.\n');
+   fprintf('    3) Keep all geodesics.\n');
    select_option = input('Which of the above options do you prefer: ');
-   if select_option==1 || select_option==2
+   if select_option==1 || select_option==2 || select_option==3
       break
    else
       fprintf('\nERROR: You must enter 1 or 2.\n')
@@ -52,16 +54,17 @@ GoodMaxGeodesics = zeros(length(maxclass),1);
 GeoIndex = 1;
 
 switch select_option % two cases for select_option
-   case select_option == 1
+   case 1
       
       for Max = 1:length(maxclass)
-         % There are rare cases where a maxclass has no geodesics connected
-         % to it.  This only happens on the boundary of the data set.  This
-         % next if statment avoids that case.
+         % There are cases where a maxclass has no geodesics connected
+         % to it.  This only happens on the boundary of the data set or if
+         % you hop on an alpha complex.  This next if statment avoids that
+         % case.
          if ~isempty(maxclass(Max).nbormaxid)
             NumMaxNeighbors = length(maxclass(Max).nbormaxid);
-            % this block selecs the longest bar from 0 to n (so there can
-            % be no geodesics selected by the max.
+            % this block selecs the longest bar from 0 to n (so there might
+            % be no geodesics selected by the max).
             temp = zeros(NumMaxNeighbors+1,1);
             
             % Note that the for loop starts at 0 for the zero bar
@@ -84,6 +87,7 @@ switch select_option % two cases for select_option
             end
             [~,slot] = max(temp);
             NumGeosSelected = slot - 1;
+            
             % Currently not using this.  Consider removing.
             GoodMaxGeodesics(Max) = NumGeosSelected;
             
@@ -99,7 +103,7 @@ switch select_option % two cases for select_option
          end % if ~empty
       end %loop throught maxclass
       
-   otherwise % select_option == 2
+   case 2
       
       for Max = 1:length(maxclass)
          if ~isempty(maxclass(Max).nbormaxid)
@@ -137,6 +141,13 @@ switch select_option % two cases for select_option
          end% if ~empty max neighbors
       end% loop through maxclass
       
+   otherwise % select_option == 3  so keep/select all geodesics
+      
+      % put a 2 in the fourth column for each geodesic.
+      for a = 1:length(maxclass)
+         [maxclass(a).geodesics{:,4}] = deal(2);
+      end
+      
 end %switch select_option
 
 % Issue!  How do we handle the one sided geodesics?  Currently, in a case
@@ -148,17 +159,30 @@ end %switch select_option
 % Now find which geodesics were selected from both ends.  If a geodesic has
 % been selected from both ends, store a 2 in maxconnect{i,4} and also do
 % the same for the max at the other end of the geodesic.
-temp = vertcat(maxconnect{:,1});
-temp(:,3) = [];
-for i = 1:size(maxconnect,1)
-   if (temp(i, 1) < temp(i, 2)) && maxconnect{i,4} == 1
-      b = ismember(temp, circshift(temp(i,:), [0, 1]),'rows');
-      if maxconnect{b,4} == 1 % then both ends selected this geodesic
-         maxconnect{i,4} = 2;
-         maxconnect{b,4} = 2;
+
+if select_option == 1 || select_option == 2
+   temp = vertcat(maxconnect{:,1});
+   temp(:,3) = [];
+   for i = 1:size(maxconnect,1)
+      if (temp(i, 1) < temp(i, 2)) && maxconnect{i,4} == 1
+         b = ismember(temp, circshift(temp(i,:), [0, 1]),'rows');
+         if maxconnect{b,4} == 1 % then both ends selected this geodesic
+            maxconnect{i,4} = 2;
+            maxconnect{b,4} = 2;
+         end
+      end
+   end
+   
+   
+   GeoIndex = 1;
+   for i = 1:length(maxclass)
+      if ~isempty(maxclass(i).nbormax)
+         NumMaxNeighbors = size(maxclass(i).nbormaxid,1);
+         maxclass(i).geodesics(:,4) = maxconnect(GeoIndex:...
+            GeoIndex+NumMaxNeighbors-1,4);
+         GeoIndex = GeoIndex + NumMaxNeighbors;
       end
    end
 end
-
 end%function
 

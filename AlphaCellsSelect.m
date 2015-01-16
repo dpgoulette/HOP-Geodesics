@@ -1,15 +1,23 @@
-function [GoodEdges,one_cells] = AlphaCellsSelect2D(DT,GoodEdges,VV,VC,GoodIndex)
+function [GoodEdges,one_cells] = AlphaCellsSelect(DT,GoodEdges,VV,VC,GoodIndex)
 %
 
 % Already have good delaunay edges (1-cells).  Calculate the value of
 % alpha for each good edge
 
+dimension = size(DT.X,2);
+
+fprintf('Calculating alpha for the 1-cells.\n\n')
+if dimension == 2
+   edge_alpha = EpsilonOneCells2d(DT,GoodEdges,VV,VC);
+else
+   edge_alpha = EpsilonOneCells3d(DT,GoodEdges,VV,VC);
+end
+one_cells = edge_alpha;
+
 alpha_complex_option = 1;
 while alpha_complex_option == 1;
-   AllGoodEdges = GoodEdges;
-   fprintf('Calculating alpha for the 1-cells.\n\n')
-   edge_alpha = EpsilonOneCells2d(DT,AllGoodEdges,VV,VC);
-   one_cells = edge_alpha;
+   edge_alpha = one_cells;
+   fprintf('\n %d\n',size(edge_alpha,1))
    %       %%%%  THIS BLOCK IS DISABLED CURRENTLY %%%%%%
    %       % If we want to use the 2-cells at some time enable this block and
    %       % make sure that the function returns the cells2 matrix
@@ -48,6 +56,8 @@ while alpha_complex_option == 1;
       end
    end
    fprintf('\n')
+   
+   
    switch alpha_select_option
       case 1
          % Here we choose a global alpha as a percentage.  So .90 would keep
@@ -71,12 +81,12 @@ while alpha_complex_option == 1;
          num_keep = floor(size(edge_alpha,1) * keep_percent);
          if num_keep <= 0
             fprintf('\nAll edges will be removed!!\n')
-            AllGoodEdges =[];
+            GoodEdges =[];
          elseif num_keep >= size(edge_alpha,1)
             fprintf('\nNo edges will be deleted. This is the full Delaunay.\n')
          else
             edge_alpha(num_keep + 1:end,:) = [];
-            AllGoodEdges = edge_alpha(:,[1,2]);
+            GoodEdges = edge_alpha(:,[1,2]);
          end
          
       case 2
@@ -92,13 +102,13 @@ while alpha_complex_option == 1;
          cutoff_start = find(edge_alpha(:,3) > cutoff, 1);
          if cutoff_start == 1
             fprintf('\nAll edges will be removed!! So evry point is isolated.\n')
-            AllGoodEdges =[];
+            GoodEdges =[];
          elseif isempty(cutoff_start)
             fprintf('\nNo edges will be deleted. This is equivalent to')
             fprintf(' the full Delaunay.\n')
          else
             edge_alpha(cutoff_start:end,:) = [];
-            AllGoodEdges = edge_alpha(:,[1,2]);
+            GoodEdges = edge_alpha(:,[1,2]);
          end
       otherwise
          fprintf('\nTEST VERSION PLOTTING!\n')
@@ -186,7 +196,7 @@ while alpha_complex_option == 1;
             % The empty entries are bad points so skip them
             if ~isempty(simplex_attachments_1D{p})
                bar_lengths = [simplex_attachments_1D{p}(2:end,4);...
-                  size(AllGoodEdges, 1)] - ...
+                  size(GoodEdges, 1)] - ...
                   simplex_attachments_1D{p}(:,4);
                [~,num_edges_selected] = max(bar_lengths);
                simplex_attachments_1D{p}(1:num_edges_selected,5) = 1;
@@ -222,7 +232,7 @@ while alpha_complex_option == 1;
          TT = sort(TT,2);
          E = unique(TT,'rows');
          
-         AllGoodEdges = E;
+         GoodEdges = E;
          
          %       T(T(:,5)==1,:) = [];
          %       TT = T(:,[1,2]);
@@ -230,7 +240,7 @@ while alpha_complex_option == 1;
          %       E = unique(TT,'rows');
    end
    
-   if isempty(AllGoodEdges)
+   if isempty(GoodEdges)
       fprintf('\n\n THERE ARE NO EDGES!\n\n')
       pause(.5)
       fprintf('\n\n THERE ARE NO EDGES!\n\n')
@@ -238,17 +248,37 @@ while alpha_complex_option == 1;
       fprintf('\n\n THERE ARE NO EDGES!\n\n')
       pause(2)
       figure('name','The 1-skeleton of the alpha complex you chose.')
-      P1 = plot(DT.X(GoodIndex,1),DT.X(GoodIndex,2),'k.'); % raw data
-   else 
+      if dimension == 2
+         P1 = plot(DT.X(GoodIndex,1),DT.X(GoodIndex,2),'k.'); % raw data
+      else
+         P1 = plot3(DT.X(GoodIndex,1),DT.X(GoodIndex,2),...
+            DT.X(GoodIndex,3),'k.'); % raw data
+      end
+      axis equal
+      axis tight
+   else
       % plot the 1 skeleton of the alpha complex so the user can see the result
       figure('name','The 1-skeleton of the alpha complex you chose.')
-      P1 = plot(DT.X(GoodIndex,1),DT.X(GoodIndex,2),'k.'); % raw data
+      if dimension == 2
+         P1 = plot(DT.X(GoodIndex,1),DT.X(GoodIndex,2),'k.'); % raw data
+      else
+         P1 = plot3(DT.X(GoodIndex,1),DT.X(GoodIndex,2),...
+            DT.X(GoodIndex,3),'k.'); % raw data
+      end
       axis equal
       hold on
       axis tight
-      X=[DT.X(AllGoodEdges(:,1),1)';DT.X(AllGoodEdges(:,2),1)'];
-      Y=[DT.X(AllGoodEdges(:,1),2)';DT.X(AllGoodEdges(:,2),2)'];
-      alpha_plot = plot(X,Y,'b');
+      if dimension == 2
+         X=[DT.X(GoodEdges(:,1),1)';DT.X(GoodEdges(:,2),1)'];
+         Y=[DT.X(GoodEdges(:,1),2)';DT.X(GoodEdges(:,2),2)'];
+         alpha_plot = plot(X,Y,'b');
+      else
+         X=[DT.X(GoodEdges(:,1),1)';DT.X(GoodEdges(:,2),1)'];
+         Y=[DT.X(GoodEdges(:,1),2)';DT.X(GoodEdges(:,2),2)'];
+         Z=[DT.X(GoodEdges(:,1),3)';DT.X(GoodEdges(:,2),3)'];
+         alpha_plot = plot3(X,Y,Z,'b');
+      end
+      
    end
    if alpha_select_option == 1
       S = sprintf('Percentile of alpha edges kept: %0.1f',keep_percent);
