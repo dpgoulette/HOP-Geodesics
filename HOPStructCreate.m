@@ -220,7 +220,7 @@ for k=1:length(maxpointer)
       hop(k).maxclass=k;
    else
       %k is not a max and we havent cataloged it
-      path=zeros(1,100);%way too long.  That is fine.
+      path=zeros(1,500);% Preallocate. Way too long.  That is fine.
       
       path(1)=k;%So the path starts on the current point.
       

@@ -94,6 +94,8 @@ while quit_option == 0
       % Select the geodesics that we will keep and which we will throw out.
       [GoodMaxGeodesics, maxconnect] = SelectGeodesics(maxconnect,maxclass);
       
+      Geodesic_Tris = GeoTris(maxclass,maxindex);
+      
       fprintf('\nDo you want to plot the results? \n');
       while true
          fprintf('   1) Yes.\n')

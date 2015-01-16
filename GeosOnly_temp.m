@@ -1,5 +1,5 @@
-function GeosOnly(DT, GoodIndex, maxconnect, maxclass, maxindex,...
-   GoodMaxGeodesics, pause_option)
+% function GeosOnly(DT, GoodIndex, maxconnect, maxclass, maxindex,...
+%    GoodMaxGeodesics, pause_option)
 %  COMMENT THIS!!
 %
 %  GoodMaxGeodesics is unused and may be unneeded.  It comes from
@@ -8,7 +8,7 @@ function GeosOnly(DT, GoodIndex, maxconnect, maxclass, maxindex,...
 %
 % Loops through the maxima and plots the geodesics connected to that
 % particular max along with the persistence diagrams.
-
+pause_option = 2;
 
 % Get the plot options from the user
 fprintf('This function loops through each hop max and plots the geodesics ')
@@ -150,5 +150,5 @@ for i=1:length(maxclass)
       delete(Pmax1);
    end
 end
-end% function
+% end% function
 

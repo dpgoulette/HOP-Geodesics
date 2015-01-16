@@ -10,9 +10,11 @@ function [hop,maxclass,minclass] = HOPClasses(hop,maxindex,minindex,DT)
 % fields in the structure.  So for a max point, m, we want to know:
 %   max - the index of the max point m.
 %   points - the points in m's class
-%   nbormax - the indices of the maximums that share a boundary with m.
-%           This indexes the points themselves.
+%   nbormax - the indices of the maxima that share a boundary with m.
+%           This is an index of the neighboring maxima in the data matrix DT.X.
 %   nbormaxid - the indices of the maxclasses that neighbor m's max class.
+%           This is an index of the neighboring maxima in the maxclass
+%           struct.
 %   interiorv - the interior points of m's class
 %   boundaryv - the boundary points
 %   interiore - the interior edges (I want to improve this)
@@ -23,7 +25,8 @@ function [hop,maxclass,minclass] = HOPClasses(hop,maxindex,minindex,DT)
 %       There are no duplicate edges.  This allows plotting the hop tree.
 maxclass=struct('max',{},'points',{},...
     'nbormax',{},'nbormaxid',{},'interiorv',{},'boundaryv',{},...
-    'interiore',{},'boundarye',{},'bonds',{},'hoptree',{});
+    'interiore',{},'boundarye',{},'bonds',{},'hoptree',{},'geodesics',{},...
+    'geo_tris',{}, 'geo_tetras',{});
 minclass=struct('min',{},'points',{},...
     'nbormin',{},'nborminid',{},'interiorv',{},'boundaryv',{},...
     'interiore',{},'boundarye',{},'bonds',{},'hoptree',{});
