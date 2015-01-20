@@ -129,6 +129,8 @@ for i=1:length(maxclass)
                X=[DT.X(GeoEdges(:,1),1)';DT.X(GeoEdges(:,2),1)'];
                Y=[DT.X(GeoEdges(:,1),2)';DT.X(GeoEdges(:,2),2)'];
                Z=[DT.X(GeoEdges(:,1),3)';DT.X(GeoEdges(:,2),3)'];
+               
+               % TEST ONLY IF STATEMENT TO ONLY PLOT 1D
                color_style = color_select(maxclass,i,j);
                GeoPlotHandles1{j} = plot3(X,Y,Z,color_style);
             end
@@ -199,11 +201,11 @@ end% main function
 function color_style = color_select(maxclass,i,j)
 %
 if maxclass(i).geodesics{j,5} == 1
-   color_style = 'k-';
+   color_style = 'm-';
 elseif maxclass(i).geodesics{j,5} == 2
    color_style = 'm-';
 elseif maxclass(i).geodesics{j,5} == 3
-   color_style = 'r-';
+   color_style = 'm-';
 end
 end %color_select
 
