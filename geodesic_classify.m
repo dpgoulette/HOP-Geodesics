@@ -58,8 +58,10 @@ end % main function
 function geos = find_tet_geos(geos, maxclass, a)
 %
 
-% get the current max's tetras
-temp = vertcat(maxclass(a).geo_tetras{:,1});
+% get the current max's tetras that are included
+temp1 = vertcat(maxclass(a).geo_tetras{:,3});
+in = temp1 == 1;
+temp = vertcat(maxclass(a).geo_tetras{in,1});
 % get the unique vertices
 temp = unique(temp);
 % remove the current max.  we want the neighbors
@@ -74,13 +76,15 @@ function geos = find_tri_geos(geos, maxclass, a)
 %
 
 % get the current max's tris
-temp = vertcat(maxclass(a).geo_tris{:,1});
+temp1 = vertcat(maxclass(a).geo_tris{:,4});
+in = temp1 == 1;
+temp = vertcat(maxclass(a).geo_tris{in,1});
 % get the unique vertices
 temp = unique(temp);
 % remove the current max.  we want the neighbors
 temp(temp == maxclass(a).max) = [];
-% find the geos that are in tetras
+% find the geos that are in triangles
 r = ismember(geos(:,2), temp) & isnan(geos(:,3));
-% assign 3 to those rows.  They are 3D geos
+% assign 2 to those rows.  They are 2D geos
 geos(r,3) = 2;
 end % find_tri_geos

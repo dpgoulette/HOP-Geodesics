@@ -8,13 +8,14 @@
 %     4) GeoTris is inefficient in the way it finds ALL possible triangles.
 %     5) Remove false triangles in 2d plot (or remove triangles all
 %        together.
+%     6) Remove all usage of Geodesic_Tetras
 
 % Change the first line in the script so that the "Data" variable holds
 % whatever the name of your data matrix is.  The matrix must be 2D or 3D
 % data.
 
-% Data = load('3D_example.txt');
-Data = load('FlatDataExample.txt');
+Data = load('3D_example.txt');
+% Data = load('FlatDataExample.txt');
 
 % while true
 %    fprintf('\nEnter the name of the file you wish to study in single quotes\n')
