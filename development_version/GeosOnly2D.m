@@ -1,5 +1,4 @@
-function GeosOnly2D(DT, GoodIndex, maxconnect, maxclass, maxindex,...
-   GoodMaxGeodesics, pause_option,Geodesic_Tris)
+function GeosOnly2D_edit(DT, GoodIndex, maxclass, maxindex, pause_option)
 %  COMMENT THIS!!
 %
 %  GoodMaxGeodesics is unused and may be unneeded.  It comes from
@@ -95,20 +94,18 @@ for i=1:length(maxclass)
    %cases on the boundary of the data space where a max class is isolated.
    %These cases are pathological and can be ignored.)
    if ~isempty(maxclass(i).nbormaxid)
-      % Now get the number of max neighobrs for the ith max.
-      NumMaxNeighbors = length(maxclass(i).nbormaxid);
+      
       if pause_option == 1
          Pmax1 = plot(DT.X(maxclass(i).max,1),DT.X(maxclass(i).max,2),'r*');
-      end
-      
-      % make arrays for storing plot handles; for batch deleting later
-      GeoPlotHandles1 = cell(NumMaxNeighbors,1);
-      
-      if pause_option ==1
          pause
       end
       
-      for j=GeoIndex:(GeoIndex+NumMaxNeighbors-1)
+      % make arrays for storing plot handles; for batch deleting later
+      if delete_option == 1
+         GeoPlotHandles1 = cell(size(maxclass(i).nbormaxid,1),1);
+      end
+      
+      for j=1:size(maxclass(i).geodesics,1)
          % In this section:
          %     iterate through the geodesics of the ith max plot the
          %     geodesics connected to the ith max based on the user options
@@ -116,25 +113,26 @@ for i=1:length(maxclass)
          
          % plot the geodesics connected to the current max.
          if plot_option == 2 %then only plot selected geodesics
-            %  if j-GeoIndex+1 <= GoodMaxGeodesics(i)
-            if maxconnect{j,1}(1) < maxconnect{j,1}(2) && ...
-                  maxconnect{j,4} == 2
+            if maxclass(i).geodesics{j,2}(1) < maxclass(i).geodesics{j,2}(2) && ...
+                  maxclass(i).geodesics{j,4} == 2
                % Plot only the geodesics that are included from both ends.
-               % Plot in both the zoomed out and zoomed in plots.
-               GeoPath = maxconnect{j,2};
+               GeoPath = maxclass(i).geodesics{j,1};
                GeoEdges = [GeoPath(1:end-1)', GeoPath(2:end)'];
                X=[DT.X(GeoEdges(:,1),1)';DT.X(GeoEdges(:,2),1)'];
                Y=[DT.X(GeoEdges(:,1),2)';DT.X(GeoEdges(:,2),2)'];
-               GeoPlotHandles1{j-GeoIndex+1} = plot(X,Y,'k-');
+               GeoPlotHandles1{j} = plot(X,Y,'k-');
             end
          else % plot all geodesics
-            %Plot this geodesic connected to the current max.  Plot in both
-            %the zoomed out and zoomed in plots.
-            GeoPath = maxconnect{j,2};
-            GeoEdges = [GeoPath(1:end-1)', GeoPath(2:end)'];
-            X=[DT.X(GeoEdges(:,1),1)';DT.X(GeoEdges(:,2),1)'];
-            Y=[DT.X(GeoEdges(:,1),2)';DT.X(GeoEdges(:,2),2)'];
-            GeoPlotHandles1{j-GeoIndex+1} = plot(X,Y,'k-');
+            % Plot this geodesic connected to the current max as long as it
+            % hasn't already been plotted earlier (i.e. the index of the
+            % opposite end of the geodesic is less than the current index).
+            if maxclass(i).geodesics{j,2}(1) < maxclass(i).geodesics{j,2}(2)
+               GeoPath = maxclass(i).geodesics{j,1};
+               GeoEdges = [GeoPath(1:end-1)', GeoPath(2:end)'];
+               X=[DT.X(GeoEdges(:,1),1)';DT.X(GeoEdges(:,2),1)'];
+               Y=[DT.X(GeoEdges(:,1),2)';DT.X(GeoEdges(:,2),2)'];
+               GeoPlotHandles1{j} = plot(X,Y,'k-');
+            end
          end
          
          if pause_option == 1
@@ -142,8 +140,6 @@ for i=1:length(maxclass)
          end
       end
       
-      %Update the GeoIndex
-      GeoIndex = GeoIndex+NumMaxNeighbors;
       if delete_option == 1
          %delete all of the plots
          temp = vertcat(GeoPlotHandles1{:});
@@ -154,14 +150,16 @@ for i=1:length(maxclass)
       end
    end
 end
-for a = 1:size(Geodesic_Tris,1)
-   for b = 1:size(Geodesic_Tris{a,3},1)
-      if a == Geodesic_Tris{a,1}(b,1)
+
+for a = 1:length(maxclass)
+   for b = 1:size(maxclass(a).geo_tris,1)
+      if a == maxclass(a).geo_tris{b,2}(1)
          %Then we haven't plotted it yet.
-         if plot_option == 2 
+         if plot_option == 2
+            
             % Here we only plot triangles created by SELECTED geodesics.
-            if Geodesic_Tris{a,3}{b,2} == 1
-               geo_tri_temp = Geodesic_Tris{a,3}{b,1};
+            if maxclass(a).geo_tris{b,4} == 1
+               geo_tri_temp = maxclass(a).geo_tris{b,3};
                x=DT.X(geo_tri_temp,1)';
                y=DT.X(geo_tri_temp,2)';
                patch(x,y,'magenta','FaceAlpha',.7,'EdgeColor','magenta');
@@ -169,7 +167,7 @@ for a = 1:size(Geodesic_Tris,1)
          else
             % Here we create ALL geodesic triangs.  This is used with alpha
             % complexes.
-            geo_tri_temp = Geodesic_Tris{a,3}{b,1};
+            geo_tri_temp = maxclass(a).geo_tris{b,3};
             x=DT.X(geo_tri_temp,1)';
             y=DT.X(geo_tri_temp,2)';
             patch(x,y,'magenta','FaceAlpha',.7,'EdgeColor','magenta');

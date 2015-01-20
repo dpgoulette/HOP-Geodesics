@@ -16,7 +16,7 @@ fprintf('\n')
 
 
 if size(DT.X,2) == 3
-   GeosOnly3D(DT, GoodIndex, maxclass, maxindex, pause_option, Geodesic_Tris)
+   GeosOnly3D(DT, GoodIndex, maxclass, maxindex, pause_option)
    
 else % The data is 2 dimensional
    
@@ -43,15 +43,13 @@ else % The data is 2 dimensional
                GoodMaxGeodesics)
          else
             clear plot_option
-            GeosOnly2D(DT, GoodIndex, maxconnect, maxclass, maxindex,...
-               GoodMaxGeodesics, 1,Geodesic_Tris)
+            GeosOnly2D_edit(DT, GoodIndex, maxclass, maxindex, 1)
          end
          
       otherwise % No pause between maxima
          fprintf('\n')
          clear plot_option
-         GeosOnly2D(DT, GoodIndex, maxconnect, maxclass, maxindex,...
-            GoodMaxGeodesics, pause_option,Geodesic_Tris)
+         GeosOnly2D_edit(DT, GoodIndex, maxclass, maxindex, pause_option)
          clear pause_option
    end
 end
