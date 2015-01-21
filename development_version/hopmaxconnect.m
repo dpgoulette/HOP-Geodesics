@@ -1,4 +1,4 @@
-function [maxconnect, maxclass] = hopmaxconnect_edit(points,maxclass,hop)
+function [maxconnect, maxclass] = hopmaxconnect(points,maxclass,hop)
 %  FIX - if two neighbor max paths have the same max-length edge, then we
 %     need to check the second longest, and then the third etc, until the tie
 %     is broken.  Currently the code only checks the longest edge.

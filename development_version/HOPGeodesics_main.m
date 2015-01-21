@@ -14,8 +14,8 @@
 % whatever the name of your data matrix is.  The matrix must be 2D or 3D
 % data.
 
-Data = load('3D_example.txt');
-% Data = load('FlatDataExample.txt');
+% Data = load('3D_example.txt');
+Data = load('FlatDataExample.txt');
 
 % while true
 %    fprintf('\nEnter the name of the file you wish to study in single quotes\n')

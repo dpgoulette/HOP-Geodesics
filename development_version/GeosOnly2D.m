@@ -87,8 +87,6 @@ end
 
 maxima_plot = plot(DT.X(maxindex,1),DT.X(maxindex,2),'r.');
 
-
-GeoIndex = 1;
 for i=1:length(maxclass)
    %Now check to see that the max class has max neighbors. (There are odd
    %cases on the boundary of the data space where a max class is isolated.

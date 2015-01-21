@@ -1,4 +1,5 @@
-function GeosWithStepFunc(DT, GoodIndex, maxclass, maxindex)
+function GeosWithStepFunc(DT, GoodIndex, maxconnect, maxclass,...
+   maxindex,GoodMaxGeodesics)
 %  COMMENT THIS!!
 %
 % Loops through the maxima and plots the geodesics connected to that
@@ -85,18 +86,15 @@ BarCode1 = subplot('Position',[0.575, 0.537, 0.4, 0.4]);
 BarCode2 = subplot('Position',[0.575 0.04 0.4 0.4]);
 
 %need the max length geodesic in the dataset
-temp = vertcat(maxclass.geodesics);
-num_geodesics = size(temp, 1) / 2;
-temp = vertcat(temp{:,2});
+temp = vertcat(maxconnect{:,1});
 MaxGeoLength = max(temp(:,3));
 
+GeoIndex = 1;
 for i=1:length(maxclass)
-   % Now check to see that the max class has max neighbors. (There are odd
-   % cases on the boundary of the data space where a max class is isolated.
-   % These cases are pathological and can be ignored.)
-   if isempty(maxclass(i).nbormaxid)
-      continue
-   else
+   %Now check to see that the max class has max neighbors. (There are odd
+   %cases on the boundary of the data space where a max class is isolated.
+   %These cases are pathological and can be ignored.)
+   if ~isempty(maxclass(i).nbormaxid)
       %Now get the number of max neighobrs for the ith max.
       NumMaxNeighbors = length(maxclass(i).nbormaxid);
       
@@ -126,8 +124,7 @@ for i=1:length(maxclass)
       %plot the zero bar first before the loop.  This is for the
       %persistence by geodesic LENGTH.
       subplot(BarCode1)
-% %       BarX = [0; maxconnect{GeoIndex,1}(3)];
-      BarX = [0; maxclass(i).geodesics{1,2}(3)];
+      BarX = [0; maxconnect{GeoIndex,1}(3)];
       BarY = [0; 0];
       Bar1{1} = plot(BarX,BarY,'r-');
       hold on
@@ -139,19 +136,18 @@ for i=1:length(maxclass)
       %plot the zero bar first before the loop.  This is for the
       %persistence by gedesic length RANK.
       subplot(BarCode2)
-      BarX = [0; maxclass(i).geodesics{1,3}];
+      BarX = [0; maxconnect{GeoIndex,3}];
       BarY = [0; 0];
       Bar2{1} = plot(BarX,BarY,'r-');
       hold on
       title('Persistance by rank order of geodesic.')
-      axis([0, num_geodesics, -0.3 NumMaxNeighbors+0.3])
+      axis([0, size(maxconnect,1)/2, 0-0.3 NumMaxNeighbors+0.3])
 %       set(BarCode2,'XTickLabel',[])
       set(BarCode2,'Ytick',0:NumMaxNeighbors)
       
       pause
       
-% %       for j=GeoIndex:(GeoIndex+NumMaxNeighbors-1)
-      for j=1:NumMaxNeighbors
+      for j=GeoIndex:(GeoIndex+NumMaxNeighbors-1)
          % In this section:
          %     iterate through the geodesics of the ith max
          %     plot the geodesics connected to the ith max in order from
@@ -161,41 +157,62 @@ for i=1:length(maxclass)
          
          % plot the geodesics connected to the current max.
          if plot_option == 2 %then only plot selected geodesics
-            if maxclass(i).geodesics{j,4} == 2
+%            if j-GeoIndex+1 <= GoodMaxGeodesics(i)
+            if maxconnect{j,1}(1) < maxconnect{j,1}(2) && ...
+                  maxconnect{j,4} == 2
                % Plot only the geodesics that are included from both ends.
                % Plot in both the zoomed out and zoomed in plots.
-               GeoPath = maxclass(i).geodesics{j,1};
+               GeoPath = maxconnect{j,2};
                GeoEdges = [GeoPath(1:end-1)', GeoPath(2:end)'];
                X=[DT.X(GeoEdges(:,1),1)';DT.X(GeoEdges(:,2),1)'];
                Y=[DT.X(GeoEdges(:,1),2)';DT.X(GeoEdges(:,2),2)'];
                subplot(DataPlot1)
-               GeoPlotHandles1{j} = plot(X,Y,'r-');
+               GeoPlotHandles1{j-GeoIndex+1} = plot(X,Y,'r-');
                subplot(DataPlot2)
-               GeoPlotHandles2{j} = plot(X,Y,'r-');
+               GeoPlotHandles2{j-GeoIndex+1} = plot(X,Y,'r-');
             end
          else % plot all geodesics
             %Plot this geodesic connected to the current max.  Plot in both
             %the zoomed out and zoomed in plots.
-            GeoPath = maxclass(i).geodesics{j,1};
+            GeoPath = maxconnect{j,2};
             GeoEdges = [GeoPath(1:end-1)', GeoPath(2:end)'];
             X=[DT.X(GeoEdges(:,1),1)';DT.X(GeoEdges(:,2),1)'];
             Y=[DT.X(GeoEdges(:,1),2)';DT.X(GeoEdges(:,2),2)'];
             subplot(DataPlot1)
-            GeoPlotHandles1{j} = plot(X,Y,'r-');
+            GeoPlotHandles1{j-GeoIndex+1} = plot(X,Y,'r-');
             subplot(DataPlot2)
-            GeoPlotHandles2{j} = plot(X,Y,'r-');
+            GeoPlotHandles2{j-GeoIndex+1} = plot(X,Y,'r-');
          end
          
          %%%%% Bar code 1. Persistance by the length of geodesic.  %%%%
-         if j < NumMaxNeighbors
+         if NumMaxNeighbors == 1
+            %This case forces the entire persistance plot to be plotted all
+            %at once.
+            BarX = [maxconnect{j,1}(3);...
+                    MaxGeoLength];
+            BarY = [1;...
+                    1];
             
-            BarX = [maxclass(i).geodesics{j,2}(3);
-                    maxclass(i).geodesics{j+1,2}(3)];
-            BarY = [j;
-                    j];
+         elseif j==GeoIndex% j== GeoIndex && NumMaxNeighbors > 1
+            
+            % then we are on the first iteration of this for loop (index j)
+            % and the number of neighbors is more than one.  Thus not on
+            % the last neighbor so the persistance bar will start at point
+            % (0,0) and end at the first change point.
+            
+            BarX = [maxconnect{j,1}(3);
+                    maxconnect{j+1,1}(3)];
+            BarY = [j-GeoIndex+1;
+                    j-GeoIndex+1];
+         elseif j < GeoIndex+NumMaxNeighbors-1
+            %j is greater than GeoIndex but not on the last geodesic yet
+            BarX = [maxconnect{j,1}(3); 
+                    maxconnect{j+1,1}(3)];
+            BarY = [j-GeoIndex+1; 
+                    j-GeoIndex+1];
          else %we are on the last geodesic for this max
             %plot the last persistance bar.
-            BarX = [maxclass(i).geodesics{j,2}(3);...
+            BarX = [maxconnect{j,1}(3);...
                     MaxGeoLength]; 
                
             BarY = [NumMaxNeighbors;...
@@ -203,7 +220,7 @@ for i=1:length(maxclass)
          end
          
          subplot(BarCode1)
-         Bar1{j+1} = plot(BarX,BarY,'r-');
+         Bar1{j-GeoIndex+2} = plot(BarX,BarY,'r-');
 %          hold on
 %          title('Persistance by length of geodesic.')
          axis([0 MaxGeoLength 0-0.3 NumMaxNeighbors+0.3])
@@ -215,50 +232,44 @@ for i=1:length(maxclass)
          % most of this code is similar to Bar code 1 section.  The only
          % difference is with the x coordinate of the changepoints in the
          % step graph.
-         
-% %          if NumMaxNeighbors == 1
-% %             %This special case forces the entire persistance plot to be plotted all
-% %             %at once.
-% %             BarX = [maxconnect{j,3};...
-% %                     size(maxconnect,1)/2];
-% %             BarY = [1;...
-% %                     1];
-% %             
-% %          elseif j==1% j== GeoIndex && NumMaxNeighbors > 1
-% %             
-% %             % then we are on the first iteration of this for loop (index j)
-% %             % and the number of neighbors is more than one.  Thus not on
-% %             % the last neighbor so the persistance bar will start at point
-% %             % (0,0) and end at the first change point.
-% %             
-% %             
-         if j < NumMaxNeighbors
-            % Then there is more than one neigbor (hence more than one
-            % geodesic).
-            BarX = [maxclass(i).geodesics{j,3};
-                    maxclass(i).geodesics{j+1,3}];
-            BarY = [j;
-                    j];
-         else % j == NumMaxNeighbors. We are on the last geodesic for this max
-            % plot the last persistance bar.
-            BarX = [maxclass(i).geodesics{j,3};...
-                    num_geodesics]; 
+         if NumMaxNeighbors == 1
+            %This case forces the entire persistance plot to be plotted all
+            %at once.
+            BarX = [maxconnect{j,3};...
+                    size(maxconnect,1)/2];
+            BarY = [1;...
+                    1];
+            
+         elseif j==GeoIndex% j== GeoIndex && NumMaxNeighbors > 1
+            
+            % then we are on the first iteration of this for loop (index j)
+            % and the number of neighbors is more than one.  Thus not on
+            % the last neighbor so the persistance bar will start at point
+            % (0,0) and end at the first change point.
+            
+            BarX = [maxconnect{j,3};
+                    maxconnect{j+1,3}];
+            BarY = [j-GeoIndex+1;
+                    j-GeoIndex+1];
+         elseif j < GeoIndex+NumMaxNeighbors-1
+            %j is greater than GeoIndex but not on the last geodesic yet
+            BarX = [maxconnect{j,3}; 
+                    maxconnect{j+1,3}];
+            BarY = [j-GeoIndex+1; 
+                    j-GeoIndex+1];
+         else %we are on the last geodesic for this max
+            %plot the last persistance bar.
+            BarX = [maxconnect{j,3};...
+                    size(maxconnect,1)/2]; 
                
             BarY = [NumMaxNeighbors;...
                     NumMaxNeighbors];
          end
-         
-         
-         
-         
-         
-         
-         
          subplot(BarCode2)
-         Bar2{j+1} = plot(BarX,BarY,'r-');
+         Bar2{j-GeoIndex+2} = plot(BarX,BarY,'r-');
 %          hold on
 %          title('Persistance by rank order of geodesic.')
-         axis([0, num_geodesics, 0-0.3 NumMaxNeighbors+0.3])
+         axis([0, size(maxconnect,1)/2, 0-0.3 NumMaxNeighbors+0.3])
 %          set(BarCode2,'XTickLabel',[])
 %          set(BarCode2,'Ytick',0:NumMaxNeighbors)
          
@@ -270,6 +281,7 @@ for i=1:length(maxclass)
 %       pause
       
       %Update the GeoIndex
+      GeoIndex = GeoIndex+NumMaxNeighbors;
       if delete_option == 1
          %delete all of the plots
          temp = vertcat(GeoPlotHandles1{:});

@@ -39,17 +39,16 @@ else % The data is 2 dimensional
          
          if plot_option == 1
             clear plot_option
-            GeosWithStepFunc(DT,GoodIndex,maxconnect,maxclass,maxindex,...
-               GoodMaxGeodesics)
+            GeosWithStepFunc(DT,GoodIndex, maxclass,maxindex)
          else
             clear plot_option
-            GeosOnly2D_edit(DT, GoodIndex, maxclass, maxindex, 1)
+            GeosOnly2D(DT, GoodIndex, maxclass, maxindex, 1)
          end
          
       otherwise % No pause between maxima
          fprintf('\n')
          clear plot_option
-         GeosOnly2D_edit(DT, GoodIndex, maxclass, maxindex, pause_option)
+         GeosOnly2D(DT, GoodIndex, maxclass, maxindex, pause_option)
          clear pause_option
    end
 end
