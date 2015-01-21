@@ -79,11 +79,11 @@ fprintf('Finished the initial prep of the data.\n')
 
 % Calculate all of the geodesics connecting neighboring max classes.  Store
 % the results in the maxclass cell.
-[maxconnect, maxclass] = hopmaxconnect(DT.X,maxclass,hop);
+maxclass = hopmaxconnect(DT.X,maxclass,hop);
 
 % Select the geodesics that we will keep and which we will throw out (if
 % any).
-[GoodMaxGeodesics, maxconnect, maxclass] = SelectGeodesics(maxconnect,maxclass);
+maxclass = SelectGeodesics(maxclass, hop);
 
 % The geodesics are already the 1D connections between maxima.  Now we want
 % to find where geodesics form triangles (2D structure) and tetras (3D
