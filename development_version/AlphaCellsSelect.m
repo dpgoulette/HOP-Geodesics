@@ -8,16 +8,15 @@ dimension = size(DT.X,2);
 
 fprintf('Calculating alpha for the 1-cells.\n\n')
 if dimension == 2
-   edge_alpha = EpsilonOneCells2d(DT,GoodEdges,VV,VC);
+   edge_alpha = AlphaOneCells2d(DT,GoodEdges,VV,VC);
 else
-   edge_alpha = EpsilonOneCells3d(DT,GoodEdges,VV,VC);
+   edge_alpha = AlphaOneCells3d(DT,GoodEdges,VV,VC);
 end
 one_cells = edge_alpha;
 
 alpha_complex_option = 1;
 while alpha_complex_option == 1;
    edge_alpha = one_cells;
-   fprintf('\n %d\n',size(edge_alpha,1))
    %       %%%%  THIS BLOCK IS DISABLED CURRENTLY %%%%%%
    %       % If we want to use the 2-cells at some time enable this block and
    %       % make sure that the function returns the cells2 matrix

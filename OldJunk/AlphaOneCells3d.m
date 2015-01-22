@@ -1,4 +1,4 @@
-function cells1 = EpsilonOneCells3d(DT,Edges,VV,VC)
+function cells1 = AlphaOneCells3d(DT,Edges,VV,VC)
 %
 
 cells1 = zeros(length(Edges),3);

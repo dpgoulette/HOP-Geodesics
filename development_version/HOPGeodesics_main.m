@@ -27,8 +27,8 @@
 % whatever the name of your data matrix is.  The matrix must be 2D or 3D
 % data.
 
-% Data = load('3D_example.txt');
-Data = load('FlatDataExample.txt');
+Data = load('3D_example.txt');
+% Data = load('FlatDataExample.txt');
 
 % Prepare the raw data for HOP. Calculate the Delaunay triangulation, the
 % Voroinoi diagram, throw away "bad" data on the boundary of the data
@@ -37,7 +37,7 @@ Data = load('FlatDataExample.txt');
 
 % User selects whether they want to hop on the complete Delaunay or an
 % alpha complex (subset of Delaunay).
-fprintf('Would you like to HOP on the full Delaunay 1-skeleton, or the\n')
+fprintf('\nWould you like to HOP on the full Delaunay 1-skeleton, or the\n')
 fprintf('1-skeleton of an alpha complex?\n')
 while true
    fprintf('   1) HOP on full Delaunay.\n')
@@ -47,13 +47,14 @@ while true
       break
    else
       fprintf('ERROR! You must enter 1 or 2.\n\n')
+      pause(1)
    end
 end
 fprintf('\n')
 
 
 if alpha_option == 1
-   % We are done.
+   % Then we don't need to calculate the alpha complex.
    clear alpha_option
 else % We will HOP on an alpha complex 1-skeleton
       clear alpha_option
