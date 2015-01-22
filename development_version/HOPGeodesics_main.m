@@ -1,14 +1,28 @@
 % Issues:
-%     1) Remove maxconnect completely.  Redo everything to use maxclass.
-%     2) Fix 2D plotting so it doesn't use maxconnect, GoodMaxGeodesics, or
-%        Geodesic_Tris.  Use maxclass only.
-%     2a) Once 2 is complet. Remove all usage of maxconnect,
-%         GoodMaxGeodesics and Geodesic_Tris.
-%     3) Add an option to keep all geodesics instead of doing selection.
-%     4) GeoTris is inefficient in the way it finds ALL possible triangles.
-%     5) Remove false triangles in 2d plot (or remove triangles all
-%        together.
-%     6) Remove all usage of Geodesic_Tetras
+%     - hopmaxconnect still uses maxconnect internally.  It works but the
+%     code is not as simple as it could be.  We possibly want to redo it to
+%     use only maxclass.
+%
+%     - GeoTris still creates a Geodesic_Tris cell that
+%     we are no longer using.  (GeoTris is not returning this cell
+%     currently.)  Consider removing this from the script.  Do everything
+%     with the maxclass struct.
+%
+%     - GeoTetras still creates a cell for the tetras.  Same issue as the
+%     previous issue.
+%
+%     - Need comments and cleanup throughout
+%           HOPDataPrepare
+%           AlphaCellsSelect
+%           HOPStructCreate
+%           HOPClasses
+%           hopmaxconnect
+%           SelectGeodesics
+%           GeoTris
+%           GeoTetras
+%           geodesic_classify
+%           GeodesicPlot (and dependencies)
+
 
 % Change the first line in the script so that the "Data" variable holds
 % whatever the name of your data matrix is.  The matrix must be 2D or 3D
@@ -16,14 +30,6 @@
 
 % Data = load('3D_example.txt');
 Data = load('FlatDataExample.txt');
-
-% while true
-%    fprintf('\nEnter the name of the file you wish to study in single quotes\n')
-%    NameString = input('including the file extension: ');
-%    Data = load(NameString);
-%    clear NameString
-%    break
-% end
 
 % Prepare the raw data for HOP. Calculate the Delaunay triangulation, the
 % Voroinoi diagram, throw away "bad" data on the boundary of the data
@@ -89,9 +95,9 @@ maxclass = SelectGeodesics(maxclass, hop);
 % to find where geodesics form triangles (2D structure) and tetras (3D
 % structure).  Of course there will only be tetras if the data is 3D to
 % begin with.
-[Geodesic_Tris, maxclass] = GeoTris(maxclass);
+maxclass = GeoTris(maxclass);
 if size(DT.X,2) == 3
-   [Geodesic_Tetras, maxclass] = GeoTetras(maxclass);
+   maxclass = GeoTetras(maxclass);
 end
 
 % The following is a temporary function.  It classifies each geodesic as

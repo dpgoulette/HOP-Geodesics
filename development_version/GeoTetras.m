@@ -1,4 +1,4 @@
-function [tetras, maxclass] = GeoTetras(maxclass)
+function maxclass = GeoTetras(maxclass)
 %
 
 %%%%%%%%%%%%  MAIN FUNCTION %%%%%%%%%%%%%%

@@ -1,4 +1,4 @@
-function [Geodesic_Tris, maxclass] = GeoTris(maxclass)
+function maxclass = GeoTris(maxclass)
 % input - maxclass, maxindex
 % output - a cell array
 
