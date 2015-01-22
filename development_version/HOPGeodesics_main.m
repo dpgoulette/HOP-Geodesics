@@ -12,7 +12,6 @@
 %     previous issue.
 %
 %     - Need comments and cleanup throughout
-%           HOPDataPrepare
 %           AlphaCellsSelect
 %           HOPStructCreate
 %           HOPClasses
@@ -34,18 +33,7 @@ Data = load('FlatDataExample.txt');
 % Prepare the raw data for HOP. Calculate the Delaunay triangulation, the
 % Voroinoi diagram, throw away "bad" data on the boundary of the data
 % space, etc.
-[DT, VV, VC, BadDataID, DTedges] = HOPDataPrepare(Data);
-
-%now remove bad edges.  They are "bad" if they contain a bad data point.
-% NOTE!!  The "GoodEdges" matrix that is created here may be altered if
-% the user chooses to HOP on an alpha complex instead of the full delaunay.
-[R,~]=find(ismember(DTedges,BadDataID));
-R=unique(R);
-GoodEdges=DTedges;
-GoodEdges(R,:)=[];%delete the bad edges.
-GoodIndex=unique(GoodEdges);
-clear R
-
+[DT, VV, VC, GoodEdges, GoodIndex] = HOPDataPrepare(Data);
 
 % User selects whether they want to hop on the complete Delaunay or an
 % alpha complex (subset of Delaunay).
