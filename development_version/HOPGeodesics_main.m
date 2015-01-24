@@ -12,7 +12,6 @@
 %     previous issue.
 %
 %     - Need comments and cleanup throughout
-%           HOPStructCreate
 %           HOPClasses
 %           hopmaxconnect
 %           SelectGeodesics

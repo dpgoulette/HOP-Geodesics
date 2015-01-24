@@ -17,11 +17,11 @@ function [hop, maxindex, minindex] = HOPStructCreate(VV,VC,GoodEdges,...
 %  hop is an vector of structs. Each entry in hop is a struct containing
 %  the key information about that point (so the length of hop is as long as
 %  the raw data DT.X). The key information that is stored for each point,
-%  p, is in the following list.  Note that we set the key for all of the
+%  p, is in the following list.  (Note that we set the key for all of the
 %  fields that we will want in hop for our work, but we do not fill in all
 %  of the values of these fields in this function.  For example, the
 %  maxclass field will be emtpy after this function terminates.  It will
-%  not be filled in until we create the maxclass struct later.  (See
+%  not be filled in until we create the maxclass struct later.  See
 %  HOPClasses.m and HOPGeadesics_main.m)
 %       edges - the edges attached to p
 %       density - the density of point p
