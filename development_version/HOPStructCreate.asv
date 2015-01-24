@@ -41,12 +41,12 @@ function [hop, maxindex, minindex] = HOPStructCreate(VV,VC,GoodEdges,...
 %       minedgesin - same but for Min class
 %       maxbonds - maxclass bonds attached to p.  Empty if p is interior
 %              point.  If p is a boundary point then one of its neighbors
-%              is in a different max class.  The edge that connects these
-%              two points is a bond edge.
-%       minbonds - Similar to maxbonds.
+%              is in a different max class, so it will have 
+%       minbonds - bonds for min class attached to p
 %       maxedgesboundary - Boundary edges for its max class (empty if it is
 %               an interior point)
-%       minedgesboundary - Similar to maxedgesboundary.
+%       minedgesboundary - Boundary edges for its min class (empty if it is
+%               an interior point)
 %       hopmaxpath - The path that p takes to hop to its max.  This is a
 %               vector of point indices into DT.X.
 %       hopminpath - The path that p takes to hop to its max.
