@@ -2,9 +2,14 @@
 % list the current issues that need to be resolved.
 
 % Issues:
-%     - hopmaxconnect still uses maxconnect internally.  It works but the
-%     code is not as simple as it could be.  We possibly want to redo it to
-%     use only maxclass.
+%
+%     - restructure the main and dependencies for clarity.  Push the user
+%     questions into the functions where possible.  Have the main only save
+%     the main data needed for data analysis. 
+%
+%     - hopmaxconnect still uses
+%     maxconnect internally.  It works but the code is not as simple as it
+%     could be.  We possibly want to redo it to use only maxclass.
 %
 %     - GeoTris still creates a Geodesic_Tris cell that
 %     we are no longer using.  (GeoTris is not returning this cell
