@@ -1,3 +1,6 @@
+% This is the main script to run the HOPGeodesics data model.  We first
+% list the current issues that need to be resolved.
+
 % Issues:
 %     - hopmaxconnect still uses maxconnect internally.  It works but the
 %     code is not as simple as it could be.  We possibly want to redo it to
@@ -12,17 +15,28 @@
 %     previous issue.
 %
 %     - Need comments and cleanup throughout
-%           HOPClasses
 %           hopmaxconnect
 %           GeodesicPlot (and dependencies)
 %
 %     - Fix the inner for loop in HOPStructCreate.  Too many hidden
 %     breakpoints. Should be a while loop.  Easier to read.
+%
+%     - Fix struct preallocation: hop, maxclass, minclass (where needed).
+%
+%     - Related to last issue: fix the assignment to the fields in
+%     HOPClasses.  Unneeded preallocation (preassignment to a fields in not
+%     needed if the array of structs is already initialized).
+%
+%     - HOPClasses still finds the boundary and interior edges but this is
+%     still not well defined.  Consider revisiting and clarifying.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%5
 
+
+%%%%%  MAIN SCRIPT %%%%%%
 
 % Change the first line in the script so that the "Data" variable holds
-% whatever the name of your data matrix is.  The matrix must be 2D or 3D
-% data.
+% whatever the name of your file holding your data array is.  The matrix
+% must be 2D or 3D data.
 
 Data = load('3D_example.txt');
 % Data = load('FlatDataExample.txt');

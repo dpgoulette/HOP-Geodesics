@@ -1,6 +1,12 @@
 function [hop,maxclass,minclass] = HOPClasses(hop,maxindex,minindex,DT)
 % HOPClasses - Creates the maxclass and minclass structs which hold the
-%     data for each maxclass and minclass.
+%     data for each maxclass and minclass.  A maxclass is the set of all
+%     points that hop to the same max (similar for minclass).  The max and
+%     min class for each good point in the data set is calculated and a
+%     variety of related information is stored in the maxclass, minclass
+%     and hop structs (details below).  The key idea is that the maxclasses
+%     (and similarly minclasses) form a partition of the data space (so the
+%     maxclasses are equivalence classes).
 %
 %     input:
 %        hop - the hop data struct
@@ -13,13 +19,18 @@ function [hop,maxclass,minclass] = HOPClasses(hop,maxindex,minindex,DT)
 %        maxclass - the maxclass struct (explained below)
 %        minclass - the minclass struct (explained below)
 %
-%     We explain the maxclass struct.  The minclass struct is similar.
 %
-%     maxclass is a vector of structs that is as long as the number of maxima
-%     in the data set.  So each entry represents a max class.  A max class is
-%     the collection of vertices that all hop to the same max (so we say they
-%     are all a member of the same max class).  Here are the fields in the
-%     structure. So for a max point, m, we want to know:
+%     %%%%%%%%%%%%% Explanation of maxclass struct %%%%%%%%%%%%%%
+%
+%     We explain the maxclass struct here.  The minclass struct is similar.
+%
+%     "maxclass" is a vector of structs that is as long as the number of
+%     maxima in the data set.  So each entry represents a max class.  A max
+%     class is the collection of data points (or vertices) that all hop to
+%     the same max (so we say they are all a member of the same max class
+%     since this is an equivalence relation that partitions the data). Here
+%     are the fields in the maxclass structure. So for a max point, m, we
+%     want to know:
 %        max -    the index of the max point m.
 %        points - the points in m's class
 %        nbormax - the indices of the maxima that share a boundary with m.
@@ -41,9 +52,12 @@ function [hop,maxclass,minclass] = HOPClasses(hop,maxindex,minindex,DT)
 %        geo_tris - the geodesic triangles
 %        geo_tetras - the geodesic tetras
 %
-%     NOTE! The fields geodesics, geo_tris and geo_tetras are created in
-%     this function but they will be empty when this function terminates.
-%     These fields will later be filled by the following functions:
+%     NOTE! The following fields are created in this function but they will
+%     be empty when this function terminates: 
+%           geodesics
+%           geo_tris 
+%           geo_tetras  
+%     These fields will be filled in later by the following functions:
 %           hopmaxconnect
 %           SelectGeodesics
 %           GeoTris
@@ -51,6 +65,49 @@ function [hop,maxclass,minclass] = HOPClasses(hop,maxindex,minindex,DT)
 %           geodesic_classify
 %     See HOPGeodesics_main as well as these functions for more
 %     information.
+%
+%     
+%     %%%%%%%%%% Explanation of data stored in the hop struct %%%%%%%%%%%
+%
+%     Many of the fields in the hop struct are updated in this function.
+%     For a give point with index p, the following describes which fields
+%     are updated and what is assigned to them:
+%
+%        hop(p).maxclassid          <==  The index of the max class that p
+%                                        belongs to.  This is an index into
+%                                        the maxclass struct.
+%        hop(p).minclassid          <==  The index of the min class that p
+%                                        belongs to.  This is an index into
+%                                        the minclass struct.
+%        hop(p).ismaxboundary       <==  true/false if p is a boundary
+%                                        point of its maxclass.
+%        hop(p).isminboundary       <==  true/false if p is a boundary
+%                                        point of its minclass.
+%        hop(p).maxedgesin          <==  Edges attached to p that are
+%                                        interior to its maxclass.
+%        hop(p).minedgesin          <==  Edges attached to p that are
+%                                        interior to its minclass.
+%        hop(p).maxbonds            <==  Edges attached to p such that the
+%                                        point at the other end of the edge
+%                                        is in a different (neighboring)
+%                                        maxclass.  These are the bond
+%                                        edges.
+%        hop(p).minbonds            <==  Edges attached to p such that the
+%                                        point at the other end of the edge
+%                                        is in a different (neighboring)
+%                                        minclass.  These are the bond
+%                                        edges.
+%        hop(p).maxedgesboundary    <==  Edges attached to p such that the
+%                                        point at the other end of the edge
+%                                        is in a boundary point of the same
+%                                        maxclass.  (Not fully functional
+%                                        currently.)
+%        hop(p).minedgesboundary    <==  Edges attached to p such that the
+%                                        point at the other end of the edge
+%                                        is in a boundary point of the same
+%                                        maxclass.  (Not fully functional
+%                                        currently.)
+
 
 % Create the maxclass and minclass structs with all fields.
 maxclass=struct('max',{},'points',{},...
@@ -65,7 +122,7 @@ minclass=struct('min',{},'points',{},...
 M=vertcat(hop.maxclass);
 m=vertcat(hop.minclass);
 
-% Catalog the max/min indices in their respective classes.  
+% Catalog the max/min point indices in their respective classes.  
 for i=1:length(maxindex)
     maxclass(i).max=maxindex(i);
     maxclass(i).points=find(M==maxindex(i));
@@ -75,9 +132,10 @@ for i=1:length(minindex)
     minclass(i).points=find(m==minindex(i));
 end
 
-
-% assign to each point in hop the index of it's max/min class.  That way
+% Assign to each point in hop the index of it's max/min class.  That way
 % we can find out all of the information about a points class.
+
+% Preallocate zeros.
 temp=0;
 [hop(:).maxclassid]=deal(temp);
 [hop(:).minclassid]=deal(temp);
@@ -88,6 +146,7 @@ for i = 1:length(maxindex)
     temp(maxindex(i))=i; 
 end
 
+% Assign the maxclass index to each point in hop
 for i = 1:length(hop)
     if ~isnan(hop(i).maxclass)
         hop(i).maxclassid = temp(hop(i).maxclass);
@@ -100,11 +159,14 @@ for i = 1:length(minindex)
     temp(minindex(i))=i; 
 end
 
+% Assign the minclass index to each point in hop
 for i = 1:length(hop)
     if ~isnan(hop(i).minclass)
         hop(i).minclassid = temp(hop(i).minclass);
     end
 end
+%%%%%%%%%%% done assigning max and min classes %%%%%%%%%%%%%%%%
+
 
 %%%% Outline for the next code section
 % Explanation for max classes. minclass is similar.
@@ -185,7 +247,7 @@ for k=1:length(hop)
     if ~isempty(hop(k).edges) && hop(k).ismaxboundary
         %To be a boundary edge, the neighbor of k needs to be a boundary
         %point.  Also, the k-th point and the neighbor must have a bond
-        %neighbor in common.  That is, k and it's boundary neighbor must
+        %neighbor in common.  That is, k and it's boundary neighbor must be
         %adjacent to the same vertex in another max class.
         %So if these are both true, then the neighbor and k are two
         %vertices in a triangle where the third vertex is in another max
@@ -260,7 +322,14 @@ for k=1:length(hop)
     end
 end
 
-%  Loop through the maxclass. Catalog everything.
+%  Loop through the maxclass. Catalog the following:
+%     maxclass.boundaryv
+%     maxclass.interiorv
+%     maxclass.boundarye
+%     maxclass.interiore
+%     maxclass.bonds
+%     maxclass.nbormax
+%     maxclass.nbormaxid
 for k=1:length(maxclass)
     P=maxclass(k).points;
     b=vertcat(hop(P).ismaxboundary);
@@ -295,7 +364,14 @@ for k=1:length(maxclass)
     end
 end
     
-% Loop through the minclass. Catalog everything.
+%  Loop through the minclass. Catalog the following:
+%     minclass.boundaryv
+%     minclass.interiorv
+%     minclass.boundarye
+%     minclass.interiore
+%     minclass.bonds
+%     minclass.nbormin
+%     minclass.nborminid
 for k=1:length(minclass)
     P=minclass(k).points;
     b=vertcat(hop(P).isminboundary);
@@ -326,12 +402,13 @@ for k=1:length(minclass)
     end
 end
 
-% Now we catalog all of the hop path edges in the maxclass struct.
-% These are not ALL of the edges in a max class.  These are only the HOP
-% edges for the hop paths for the points in the max class.  Cataloging
-% these edges in one place allows us to plot the hop trees for
-% visualisation purposes.
-
+% Now we catalog all of the hop path edges in the maxclass struct. These
+% are not ALL of the edges in a max class.  These are only the HOP path
+% edges in all of the hop paths for every point in the max class.  The set
+% of hop edges in a maxclass creates a tree with the max as the root.  The
+% entire data space is then a forest of trees where each connected
+% component is a maxclass. Cataloging these edges in one place allows us to
+% plot the hop trees for visualisation purposes.
 for a=1:length(maxclass)
     EdgesCell = cell(length(maxclass(a).points),1);
     for b=1:length(EdgesCell)
@@ -350,7 +427,7 @@ for a=1:length(maxclass)
     maxclass(a).hoptree = E;
 end
 
-%Now we do this for the min classes
+%Now we do the same for the min classes
 for a=1:length(minclass)
     EdgesCell = cell(length(minclass(a).points),1);
     for b=1:length(EdgesCell)
@@ -369,4 +446,4 @@ for a=1:length(minclass)
     minclass(a).hoptree = E;
 end
 
-end%function
+end% main function: HOPClasses

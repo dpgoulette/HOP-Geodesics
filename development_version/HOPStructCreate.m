@@ -8,21 +8,8 @@ function [hop, maxindex, minindex] = HOPStructCreate(VV,VC,GoodEdges,...
 %        This function does HOP in the direction of greatest positive
 %        gradient. Each point "hops" step-by-step until it reaches a max (a
 %        point that has greater density than all of its neighbors).  We
-%        store all results in the hop struct.  For each point in the data
-%        set, with index p, we find the following data and store the
-%        results in the following fields:
-%
-%              hop(p).density    <== the density of p.
-%              hop(p).edges      <== the edges connected to p -- k by 2
-%                                    array of indices of edge endpoints. 
-%              hop(p).maxclass   <== the index of the max p "hops" to.
-%              hop(p).minclass   <== the index of the min p "hops" to.
-%              hop(p).ismax      <== true/false whether it is a max or not
-%              hop(p).ismin      <== true/false whether it is a max or not
-%              hop(p).hopmaxpath <== the path p takes to hop to its 
-%                                    representative max.
-%              hop(p).hopminpath <== the path p takes to hop to its 
-%                                    representative min.
+%        store all results in the hop struct.  
+%        
 %
 %     inputs:
 %              VV - the voronoi vertices
@@ -40,16 +27,24 @@ function [hop, maxindex, minindex] = HOPStructCreate(VV,VC,GoodEdges,...
 %              minindex - the indices (into DT.X) of the hop minima (for
 %                         plotting)
 %
-%  hop is a vector of structs. Each entry in hop is a struct containing
-%  the key information about that point (so the length of hop is as long as
-%  the raw data DT.X). The key information that is stored for each point,
-%  p, is in the following list.  (Note that we set the key for all of the
-%  fields that we will want in hop for our work, but we do not fill in all
-%  of the values of these fields in this function.  For example, the
-%  maxclass field will be emtpy after this function terminates.  It will
-%  not be filled in until we create the maxclass struct later.  See
-%  HOPClasses.m and HOPGeadesics_main.m)
-%       edges - the edges attached to p
+%     
+%     %%%%%%%%%%%%  General explanation of the hop struct  %%%%%%%%%%%
+%
+%     hop is a vector of structs. Each entry in hop is a struct containing
+%     the key information about that point (so the length of hop is as long
+%     as the raw data DT.X). The key information that is stored for each
+%     point, p, is in the following list.  (Note that we set the key for
+%     all of the fields that we will want in hop for our work, but we do
+%     not fill in all of the values of these fields in this function.  For
+%     example, the maxclass field will be emtpy after this function
+%     terminates.  It will not be filled in until we create the maxclass
+%     struct later.  See HOPClasses.m and HOPGeadesics_main.m).  This is a
+%     description of each field that is initialized:
+%
+%       edges - the edges attached to p.  It is a k by 3 matrix where the
+%               first two columns hold the edge endpoint indices.  The
+%               third column holds the density of the neighbor of p
+%               (usefull for doing hop).
 %       density - the density of point p
 %       maxclass - the index of the max point in p's max class (i.e. the
 %                  max that p "hops" to)
@@ -76,6 +71,30 @@ function [hop, maxindex, minindex] = HOPStructCreate(VV,VC,GoodEdges,...
 %       hopmaxpath - The path that p takes to hop to its max.  This is a
 %               vector of point indices into DT.X.
 %       hopminpath - The path that p takes to hop to its max.
+%
+%
+%     %%%%%%% Details on what THIS function does to the hop struct %%%%%%%
+%
+%     As mentioned above, this function only fills some of the fields in
+%     hop.  This For each point in the data set, with index p, we find the
+%     following data and store the results in the following fields:
+%
+%              hop(p).density    <== the density of p (1/vol of voroni cell).
+%              hop(p).edges      <== the edges connected to p -- k by 3
+%                                    array.  The first column is p. The
+%                                    second column is the index of a
+%                                    neigbor of p. The third column holds
+%                                    the density of the point in the second
+%                                    column (used in the hop algorithm).
+%              hop(p).maxclass   <== the index of the max p "hops" to.
+%              hop(p).minclass   <== the index of the min p "hops" to.
+%              hop(p).ismax      <== true/false whether it is a max or not
+%              hop(p).ismin      <== true/false whether it is a max or not
+%              hop(p).hopmaxpath <== the path p takes to hop to its 
+%                                    representative max.
+%              hop(p).hopminpath <== the path p takes to hop to its 
+%                                    representative min.
+%
 %
 %  COMMENTS: We are no longer using "interior edges" and "boundary edges."
 %  Consider removing.
