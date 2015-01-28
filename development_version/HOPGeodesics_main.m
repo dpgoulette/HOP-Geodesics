@@ -15,6 +15,9 @@
 %           HOPClasses
 %           hopmaxconnect
 %           GeodesicPlot (and dependencies)
+%
+%     - Fix the inner for loop in HOPStructCreate.  Too many hidden
+%     breakpoints. Should be a while loop.  Easier to read.
 
 
 % Change the first line in the script so that the "Data" variable holds
@@ -60,8 +63,8 @@ end
 
 fprintf('Finished the initial prep of the data.\n')
 
-% Now create the hop data structure and create the path pointer that will
-% be used to do hop. Locate all of the hop maxima and minima. etc.
+% Now create the hop data structure and do the HOP algorithm based on our
+% denisity function. Locate all of the hop maxima and minima. etc.
 [hop, maxindex, minindex] = HOPStructCreate(VV,VC,GoodEdges,GoodIndex,DT);
 
 % Now create the maxclass and minclass structure which holds all of the

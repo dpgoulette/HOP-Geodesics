@@ -1,6 +1,28 @@
 function [hop, maxindex, minindex] = HOPStructCreate(VV,VC,GoodEdges,...
    GoodIndex,DT)
-%  HOPStructCreade - creates the main hop data structure.
+%  HOPStructCreade - creates the main hop data structure and does the
+%        geodesic HOP algorithm based on our density function:
+%              
+%                 1/(volume of the voronoi cell)
+%
+%        This function does HOP in the direction of greatest positive
+%        gradient. Each point "hops" step-by-step until it reaches a max (a
+%        point that has greater density than all of its neighbors).  We
+%        store all results in the hop struct.  For each point in the data
+%        set, with index p, we find the following data and store the
+%        results in the following fields:
+%
+%              hop(p).density    <== the density of p.
+%              hop(p).edges      <== the edges connected to p -- k by 2
+%                                    array of indices of edge endpoints. 
+%              hop(p).maxclass   <== the index of the max p "hops" to.
+%              hop(p).minclass   <== the index of the min p "hops" to.
+%              hop(p).ismax      <== true/false whether it is a max or not
+%              hop(p).ismin      <== true/false whether it is a max or not
+%              hop(p).hopmaxpath <== the path p takes to hop to its 
+%                                    representative max.
+%              hop(p).hopminpath <== the path p takes to hop to its 
+%                                    representative min.
 %
 %     inputs:
 %              VV - the voronoi vertices
@@ -10,11 +32,15 @@ function [hop, maxindex, minindex] = HOPStructCreate(VV,VC,GoodEdges,...
 %              DT - The Delaunay triangulation object
 %
 %     outputs:
-%              hop - the hop data structure
-%              maxindex - the indices (into DT.X) of the hop maxima
-%              minindex - the indices (into DT.X) of the hop minima
+%              hop - the hop data structure updated with the maxclass
+%                    assignment for each point and the hop path for each
+%                    point.
+%              maxindex - the indices (into DT.X) of the hop maxima (for
+%                         plotting)
+%              minindex - the indices (into DT.X) of the hop minima (for
+%                         plotting)
 %
-%  hop is an vector of structs. Each entry in hop is a struct containing
+%  hop is a vector of structs. Each entry in hop is a struct containing
 %  the key information about that point (so the length of hop is as long as
 %  the raw data DT.X). The key information that is stored for each point,
 %  p, is in the following list.  (Note that we set the key for all of the
@@ -177,7 +203,6 @@ end
 % points point to NaN.
 [maxpointer, minpointer, hop] = GradientHop(hop,GoodIndex,DT);
 
-
 fprintf('Done finding maxs, mins, and HOP path pointers.\n\n')
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -186,7 +211,10 @@ fprintf('Done finding maxs, mins, and HOP path pointers.\n\n')
 %%%% those entries first!!
 fprintf('Now finding max and min class assignment for every point.\n\n')
 
-% Now we find the max class for each point
+% Now that we know which points are maxima, we perform the HOP algorithm.
+% We HOP from each point in the direction of greatest gradient until we hit
+% a max.  Thus we find the max class for each point (i.e. we find the max
+% that each point hops to).
 for k=1:length(maxpointer)
    if isnan(maxpointer(k))
       % bad point so not in good dataset
@@ -202,7 +230,11 @@ for k=1:length(maxpointer)
       % its max class.
       hop(k).maxclass=k;
    else
-      % k is a good point that is not a max and we havent cataloged it.
+      % k is a good point that is not a max and we havent cataloged it.  So
+      % we need to run the HOP algorithm on this point until we hit a max
+      % or we hit a point that we have already cataloged earlier in the
+      % main for loop (thus we can just look up the rest of the path in the
+      % hop struct).
       
       path=zeros(1,500); % Preallocate. Way too long.  That is fine.
       
@@ -339,8 +371,8 @@ end
 
 fprintf('Done finding the max and min class assignments.\n\n')
 
-% make an index of the maxima and minima in the data set.  We will need
-% this for plotting purposes.
+% make an index array of the maxima and minima in the data set.  We will
+% need this for plotting purposes.
 maxindex=find(isinf(maxpointer));
 minindex=find(isinf(minpointer));
 
