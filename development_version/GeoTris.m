@@ -1,30 +1,74 @@
 function maxclass = GeoTris(maxclass)
-% input - maxclass, maxindex
-% output - a cell array
-
-% Want to be able to plot the geodesic triangles with fill/patch.
-%        This will be done from the Geodesic_Tris cell. One entry for each
-%        tri.
-%     -to reference how many triangles a max is connected to AFTER the
-%     selection process.
-%        This will be done from maxclass.  One entry for each max.
-%     -
+%
+%  ISSUE - This code uses a cell Geodesic_Tris which we no longer use (and
+%          the function doesn't return).  We now only use maxclass.
+%          Consider removing Geodesic_Tris from this code.
+%
+% GeoTris - searches through all of the geodesics in maxclass and finds
+%     triangles (in the graph theoretic sense).  A triangle is defined to
+%     be three maxima that are pairwise neighbors (i.e. there is a geodesic
+%     connecting each pair) AND all three geodeiscs are included (i.e. all
+%     three were selected by the SelectGeodesics function).  A geodesic
+%     triangle will occur when three parwise adjacent maxima are relatively
+%     close to each other (based on our geodesic metric).
+%
+%     input:
+%        maxclass - the maxclass struct (with the geo_tris field empty).
+%     output:
+%        maxclass - the maxclass struct with the maxclass(i).geo_tris field
+%                   updated.
+%
+%     After GeoTris completes, the maxclass.geo_tris field will be updated
+%     for each max.  If max i is not a member of any geodesic triangle,
+%     then maxclass(i).geo_tris will be empty.  But if max i is a member of
+%     at least one geodesic triangle, then maxclass(i).geo_tris will
+%     contain a j by 4 cell (where j is the number of triangles that i is a
+%     member of).  Here are the contents of the four columns:
+%
+%        maxclass(i).geo_tris{:, 1}
+%           contains the triangle vertices.  These are the point indices of
+%           the the three maxima that make up the triangle (the index is
+%           into DT.X)
+%
+%        maxclass(i).geo_tris{:, 2}
+%           contains the triangle vertices.  These are the maxclass indices of
+%           the the three maxima that make up the triangle (the index is
+%           into maxclass)
+%
+%        maxclass(i).geo_tris{:, 3}
+%           contains a 1 by k vector which contains the sequence of
+%           vertices making up the complete geodesic triangle.  This
+%           includes all of the poins in each of the three geodesics as
+%           well as the enpoints of each geodesic (the maxima).  This is
+%           primarily for 2D plotting.  This allows us to color in the
+%           geodesic triangles using a patch.  In 3D this won't work.
+%
+%        maxclass(i).geo_tris{:, 4}
+%           contains 1 or 0 depending if the triangle is included or not
+%           (respectively). A triangele is included if all three geodesics
+%           making up the "sides" of the triangele were included by the
+%           SelectGeodesics function.  In this case we put a 1 in the
+%           fourth column.  Otherwise we put a 0 to indicate the triangle
+%           is not included.
+%        
 
 Geodesic_Tris = cell(length(maxclass),3);
 
 % First find all *possible* geodesic triangles.  This is equivalent to
-% finding all triangles in a graph.  The graph here consists of the maxima
-% as vertices and the geodesics as edges.  We catalog the results in the
-% Geodesic_Tris cell.
+% finding all triangles in a graph (three pairwise adjacent vertices). The
+% graph here consists of the maxima as vertices and the geodesics as edges.
 for m = 1:length(maxclass)
    NbsID = maxclass(m).nbormaxid;
    if isempty(NbsID)
+      % then max m has no max neighbors so it can't be in a triangle.
       continue
    end
+   
    % Transpose if needed for iterating the next for loop
    if size(NbsID,2) == 1 && size(NbsID,1) > 1
       NbsID = NbsID';
    end
+   
    for a = NbsID
       NbsNbsID = maxclass(a).nbormaxid;
       CommonNbs = intersect(NbsID',NbsNbsID);
@@ -66,9 +110,10 @@ end
 % Now the main block of the function. In this block we create the sequence
 % of points which outline each geodesic triangle.  This is saved in the
 % third column of Geodesic_Tris. This sequence is a list of indices to
-% points in the raw data matrix. This information is used for plotting
-% later.  We also store each geodesic triangle in the maxclass struct.
-% Also, we mark each triangle as being included or not.
+% points in the raw data matrix, DT.X. This information is used for
+% plotting later (for 2D only).  We also store each geodesic triangle in
+% the maxclass struct. Also, we mark each triangle as being included or
+% not.
 for a = 1:length(Geodesic_Tris) % each max
    for b = 1:size(Geodesic_Tris{a,1},1) % each geodesic triangle
       
@@ -134,16 +179,11 @@ for a = 1:length(Geodesic_Tris) % each max
       maxclass(S(3)).geo_tris{r3,3} = Geodesic_Tris{a,3}{b,1};
       
       
-%       % Store the current triangle in maxclass for all three vertices
-%       % (maxima) in this triangle
-%       for max_vert = S
-%          maxclass(max_vert).geo_tris{1,b} = T;
-%       end
-      
       % Now mark whether every geodesic surrounding the current triangle
       % was selected.  If all geodesics were selected, then put a 1.  If
       % they weren't, then the triangle is not complete so put a 0.
       if Included_Temp1 == 2 && Included_Temp2 == 2 && Included_Temp3 == 2
+         % Then the triangle is included.  Put a 1
          Geodesic_Tris{a,3}{b,2} = 1;
          Geodesic_Tris{S(2),3}{r2,2} = 1;
          Geodesic_Tris{S(3),3}{r3,2} = 1;
@@ -151,6 +191,7 @@ for a = 1:length(Geodesic_Tris) % each max
          maxclass(S(2)).geo_tris{r2,4} = 1;
          maxclass(S(3)).geo_tris{r3,4} = 1;
       else
+         % The triangle is not included.
          Geodesic_Tris{a,3}{b,2} = 0;
          Geodesic_Tris{S(2),3}{r2,2} = 0;
          Geodesic_Tris{S(3),3}{r3,2} = 0;
@@ -160,11 +201,5 @@ for a = 1:length(Geodesic_Tris) % each max
       end
    end
 end
-% 
-% x = 1
-% 
-% for a = 1:length(maxclass)
-%    [maxclass(a).geo_tris{:,1}] = [Geodesic_Tris{a,1}
-%    
 
 end %function

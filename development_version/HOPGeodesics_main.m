@@ -14,10 +14,6 @@
 %     - Need comments and cleanup throughout
 %           HOPClasses
 %           hopmaxconnect
-%           SelectGeodesics
-%           GeoTris
-%           GeoTetras
-%           geodesic_classify
 %           GeodesicPlot (and dependencies)
 
 
@@ -25,8 +21,8 @@
 % whatever the name of your data matrix is.  The matrix must be 2D or 3D
 % data.
 
-% Data = load('3D_example.txt');
-Data = load('FlatDataExample.txt');
+Data = load('3D_example.txt');
+% Data = load('FlatDataExample.txt');
 
 % Prepare the raw data for HOP. Calculate the Delaunay triangulation, the
 % Voroinoi diagram, throw away "bad" data on the boundary of the data

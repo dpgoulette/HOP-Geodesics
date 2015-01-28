@@ -3,6 +3,8 @@ function maxclass = hopmaxconnect(points,maxclass,hop)
 %     need to check the second longest, and then the third etc, until the tie
 %     is broken.  Currently the code only checks the longest edge.
 %
+%  FIX? Conider refactoring code to avoid using maxconnect
+%
 %  FIX - update the comment/help section
 %
 %  FIX? - (I think this is actually good as is.  Probably don't need to fix
@@ -80,23 +82,14 @@ for a=1:length(maxclass)
             Plengths_all = cell(size(common_bonds,1),1);
             
             for c=1:size(common_bonds,1)
-               
-               %%%%%%%%%%%%%%%%%%
-               % This next block was removed along with the "Maxpath"
-               % function below.  Not needed after I added the
-               % 'hopmaxpath' field in the hop data structure
-               %%%%%%%%%%%%%%%%%%
-               %                     P1a = Maxpath(temp(c,1),maxpointer,maxclass(a).max);
-               %                     P2a = Maxpath(temp(c,2),maxpointer,...
-               %                         maxclass(maxclass(a).nbormaxid(b)).max);
-               
+              
                P1 = hop(common_bonds(c,1)).hopmaxpath;
                P2 = hop(common_bonds(c,2)).hopmaxpath;
                if isempty(P1)
-                  %then temp(c,1) is a boundary point that is also a
-                  %max! So it's hop path has no edges.  Thus we must
-                  %tack it on to the geodesic by making P1 contain
-                  %this point only.  i.e. P1 is a single vertex "path."
+                  % then temp(c,1) is a boundary point that is also a
+                  % max! So it's hop path has no edges.  Thus we must
+                  % tack it on to the geodesic by making P1 contain
+                  % this point only.  i.e. P1 is a single vertex "path."
                   P1 = common_bonds(c,1);
                end
                if isempty(P2)
@@ -105,14 +98,14 @@ for a=1:length(maxclass)
                end
                
                Paths{c}=[fliplr(P1), P2];
-               %now find the euclidean length of the longest edge in
-               %the path from max to max.  Also return the lengths of all
-               %the edges 
+               % now find the euclidean length of the longest edge in
+               % the path from max to max.  Also return the lengths of all
+               % the edges 
                [Plengths(c), Plengths_all{c}] =Plength(Paths{c},points);
                
             end
-            %Now remove the bond paths we just calculated from the B
-            %matrix for the next iteration of this for loop.
+            % Now remove the bond paths we just calculated from the B
+            % matrix for the next iteration of this for loop.
             B(r,:)=[];
             [min_length, id] = min(Plengths);   
             
@@ -191,7 +184,8 @@ for i = 1:length(maxclass)
       GeoIndex = GeoIndex + NumMaxNeighbors;
    end
 end
-% Now add a third column to maxconnectSort that holds the rank of the
+
+% Now add a third column to maxconnect that holds the rank of the
 % geodesic in that row.  The rank is from shortest to longest.  So the
 % shortest geodesic will get a 1, the next longest a 2, etc.  This will be
 % used for the second step function in the GeodesicPlot code.
@@ -222,28 +216,3 @@ D = X(P(2:end),:)-X(P(1:end-1),:);
 T = sort(sqrt(sum(D.^2,2)),'descend');
 L = max(T);
 end %Plength function
-
-
-%%%% Old section.  Not needed any more.  We save the hop paths when doing
-%%%% hop so we can just look this up in the data base.  No need to
-%%%% calculate it here.
-% function Path = Maxpath(p,maxpointer,Max)
-% % find the maxpath for the point p.
-%
-% if p==Max
-%     %point k is a max
-%     Path = p;
-% else
-%     Path=zeros(1,100);%way too long.  That is fine.
-%     Path(1)=p;
-%     for a=2:length(maxpointer)
-%         if maxpointer(Path(a-1))==Max %done
-%             Path(a)=maxpointer(Path(a-1));
-%             Path(a+1:end)=[];
-%             break
-%         else %the path continues;
-%             Path(a)=maxpointer(Path(a-1));
-%         end
-%     end
-% end
-% end

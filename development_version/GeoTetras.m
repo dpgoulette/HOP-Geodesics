@@ -1,20 +1,75 @@
 function maxclass = GeoTetras(maxclass)
 %
+%  ISSUE - GeoTetras uses the cell called "tetras" which we used to return.
+%          This cell is no longer needed.  Consider removing and only using
+%          maxclass.
+%
+% GeoTetras - searches through all of the geodesics in maxclass and finds
+%     tetrahedra (in the graph theoretic sense).  This function is only
+%     meaningful if the data is three dimensional.  A tetrahedron is
+%     defined to be four maxima that are pairwise neighbors (i.e. there is
+%     a geodesic connecting each pair) AND all six geodeiscs which make up
+%     the "edges" of the tetrahedron are included (i.e. all six geodesics
+%     were selected by the SelectGeodesics function).  A geodesic
+%     tetrahedron will occur when four parwise adjacent maxima are
+%     relatively close to each other (based on our geodesic metric).
+%
+%     input:
+%        maxclass - the maxclass struct (with the geo_tris field empty).
+%     output:
+%        maxclass - the maxclass struct with the maxclass(i).geo_tetras field
+%                   updated.
+%
+%     After GeoTetras completes, the maxclass.geo_tetras field will be
+%     updated for each max.  If max i is not a member of any geodesic
+%     tetrahedron, then maxclass(i).geo_tetras will be empty.  But if max i
+%     is a member of at least one geodesic tetrahedron, then
+%     maxclass(i).geo_tetras will contain a j by 3 cell (where j is the
+%     number of tetrahedra that i is a member of).  Here are the contents
+%     of the three columns:
+%
+%        maxclass(i).geo_tetras{:, 1}
+%           contains the tetrahedron vertices.  These are the point indices of
+%           the the four maxima that make up the tetrahedron (the index is
+%           into DT.X)
+%
+%        maxclass(i).geo_tetras{:, 2}
+%           contains the tetrahedron vertices.  These are the maxclass
+%           indices of the the four maxima that make up the tetrahedron
+%           (the index is into maxclass)
+%
+%        maxclass(i).geo_tetras{:, 3}
+%           contains 1 or 0 depending if the tetrahedron is included or not
+%           (respectively). A triangele is included if all six geodesics
+%           making up the "sides" of the tetrahedron were included by the
+%           SelectGeodesics function.  In this case we put a 1 in the
+%           fourth column.  Otherwise we put a 0 to indicate the tetrahedron
+%           is not included.
 
 %%%%%%%%%%%%  MAIN FUNCTION %%%%%%%%%%%%%%
+
+% We find each tetra attached to each max.  This is made efficient by
+% starting our search with each triangle attached to each max.  A triangle
+% plus one more vertex makes a tetra.
+
 tetras = cell(length(maxclass),3);
 for a = 1:length(maxclass)
    if isempty(maxclass(a).geo_tris)
-      % So this max is not a part of any max triangle.  Thus it can't be a
-      % part of a tetra. Move on to the next max.
+      % So this max has no geodescis attached to it, hence it is not a part
+      % of any tetra.
       continue
    end
+   
+   % loop through each triangle attached to max a
    for b = 1:size(maxclass(a).geo_tris, 1)
+      
+      %  Check to see of we already did this triangle.
       if maxclass(a).geo_tris{b, 2}(1) < a
          % this means we already cataloged all tetras attached to this
          % triangle in an earlier iteration.
          continue
       end
+      
       current_tri = maxclass(a).geo_tris{b, 2};
       % Find any neighbors the 3 vertices have in common.  This defines a
       % tetra.
@@ -25,15 +80,17 @@ for a = 1:length(maxclass)
       
       % We know that all indices in current_tri are >= a. Now, if any of
       % the common neigbors have index less than a (the outer loop index),
-      % then we already cataloged this tetra in an earlier iteration.
+      % then we already cataloged this tetra in an earlier iteration.  So
+      % remove them from common_nbs.
       common_nbs(common_nbs < a) = [];
       
       % check if there are no common nbs
       if isempty(common_nbs)
          % Thus no common neighbors. So no tetras to catalog. Move to the
-         % next.
+         % next.  Skip to the next triangle.
          continue
       end
+      
       % Each common neighbor defines a tetra.  Store all tetras in the
       % Tetras cell for now.
       for c = 1:length(common_nbs)
@@ -87,13 +144,7 @@ for a = 1:length(maxclass)
    end
 end
 
-% % Sort the tetras?? Do we need this?
-% for a = 1:length(tetras)
-%    if ~isempty(tetras{a,1})
-%       tetras{a,1} = sortrows(tetras{a,1});
-%       tetras{a,2} = sortrows(tetras{a,2});
-%    end
-% end
+% Assign everything in tetras to the appropriate place in maxclass.
 for a = 1:length(tetras)
    if ~isempty(tetras{a,1})
       maxclass(a).geo_tetras =...
@@ -103,24 +154,27 @@ for a = 1:length(tetras)
    end
 end
 end % main function
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%% DEPENDENT FUNCTIONS %%%%%%%%%%%%%%
+%               | |       | |
+%               | |       | |
+%              \   /     \   /
+%               \ /       \ /
 
-
-%%%%%% Dependent functions for GeoTetras %%%%%
 function include_tet = tetra_membership(T, maxclass)
-% this function checks to see if all 4 triangles of tetra T are
-% included.  This is the same as checking if all 6 geodesics that
-% make up T have been included.
+% tetra_membership -- checks to see if all 4 triangles of tetra T are
+%        included.  This is the same as checking if all 6 geodesics that
+%        make up T have been included.
 %
-% inputs:   T        --- 1 by 4 matrix of indices for the corners of
-%                        a tetra
+%     inputs:   
+%           T --- a 1 by 4 matrix of indices for the corners ofa tetra
 %           maxclass --- The maxclass struct.
 %
-% output:   1 or 0   --- If the tetra is included return a 1.
-%                        If not, return a 0
+%     output:   
+%           1 or 0 --- If the tetra is included return a 1. If not, return
+%           a 0.
 
-% example T = [1, 6, 10, 51]
 triangles = nchoosek(T, 3);
 for a = 1:size(triangles,1)
    x = vertcat(maxclass(triangles(a,1)).geo_tris{:,2});
@@ -129,9 +183,11 @@ for a = 1:size(triangles,1)
    % Return 0.
    if ~maxclass(triangles(a,1)).geo_tris{r,4}
       include_tet = 0;
+      % Short circut the function and return 0.
       return
    end
 end
+
 % If all of the triangles were included then we get to this point.
 % Return 1
 include_tet = 1;
