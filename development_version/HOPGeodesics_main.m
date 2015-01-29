@@ -43,44 +43,14 @@
 % whatever the name of your file holding your data array is.  The matrix
 % must be 2D or 3D data.
 
-Data = load('3D_example.txt');
-% Data = load('FlatDataExample.txt');
+% Data = load('3D_example.txt');
+Data = load('FlatDataExample.txt');
 
-% Prepare the raw data for HOP. Calculate the Delaunay triangulation, the
-% Voroinoi diagram, throw away "bad" data on the boundary of the data
-% space, etc.
+% Prepare the raw data for HOP. Calculate the Delaunay triangulation and the
+% Voroinoi diagram.  Then throw away "bad" data on the boundary of the data
+% space.  Also, the user has an option to calculate an alpha complex in
+% various ways.
 [DT, VV, VC, GoodEdges, GoodIndex] = HOPDataPrepare(Data);
-
-% User selects whether they want to hop on the complete Delaunay or an
-% alpha complex (subset of Delaunay).
-fprintf('\nWould you like to HOP on the full Delaunay 1-skeleton, or the\n')
-fprintf('1-skeleton of an alpha complex?\n')
-while true
-   fprintf('   1) HOP on full Delaunay.\n')
-   fprintf('   2) HOP on alpha complex.\n')
-   alpha_option = input('Choose one of the above: ');
-   if alpha_option == 2 || alpha_option == 1
-      break
-   else
-      fprintf('ERROR! You must enter 1 or 2.\n\n')
-      pause(1)
-   end
-end
-fprintf('\n')
-
-% If the user wants to HOP on the one skeleton of the alpha complex (a
-% subset of Delaunay), then run the selection scheme.  GoodEdges will be
-% altered.  Edges will be removed.
-if alpha_option == 1
-   % Then we don't need to calculate the alpha complex.
-   clear alpha_option
-else % We will HOP on an alpha complex 1-skeleton
-      clear alpha_option
-      GoodEdges = AlphaCellsSelect(DT,GoodEdges,VV,VC,GoodIndex);
-      fprintf('\nFinished selecting the alpha complex\n')
-end
-
-fprintf('Finished the initial prep of the data.\n')
 
 % Now create the hop data structure and do the HOP algorithm based on our
 % denisity function. Locate all of the hop maxima and minima. etc.
@@ -123,7 +93,7 @@ while true
       break
    elseif plot_option == 1
       clear plot_option
-      run('GeodesicPlot')
+      GeodesicPlot(DT, GoodIndex, maxclass, maxindex)
       break
    else
       fprintf('ERROR! You must enter 1 or 2.\n\n')

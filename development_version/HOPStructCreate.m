@@ -76,7 +76,7 @@ function [hop, maxindex, minindex] = HOPStructCreate(VV,VC,GoodEdges,...
 %     %%%%%%% Details on what THIS function does to the hop struct %%%%%%%
 %
 %     As mentioned above, this function only fills some of the fields in
-%     hop.  This For each point in the data set, with index p, we find the
+%     hop.  For each point in the data set, with index p, we find the
 %     following data and store the results in the following fields:
 %
 %              hop(p).density    <== the density of p (1/vol of voroni cell).

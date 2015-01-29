@@ -1,3 +1,6 @@
+function GeodesicPlot(DT, GoodIndex, maxclass, maxindex)
+% GeodesicPlot -- creates a plot of the HOP geodesics model.
+
 fprintf('We will now plot the max geodesics.\n\n')
 while true
    fprintf('Pause between maxima?\n')
@@ -11,9 +14,6 @@ while true
    end
 end
 fprintf('\n')
-
-
-
 
 if size(DT.X,2) == 3
    GeosOnly3D(DT, GoodIndex, maxclass, maxindex, pause_option)
@@ -52,4 +52,6 @@ else % The data is 2 dimensional
          clear pause_option
    end
 end
+
+end % main function: GeodesicPlot
 
