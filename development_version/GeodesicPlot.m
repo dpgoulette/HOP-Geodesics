@@ -22,7 +22,6 @@ else % The data is 2 dimensional
    
    switch pause_option
       case 1 %pause between maxima
-         clear pause_option
          
          fprintf('Would you like to see the step functions for each max?\n')
          while true
@@ -38,18 +37,14 @@ else % The data is 2 dimensional
          fprintf('\n')
          
          if plot_option == 1
-            clear plot_option
             GeosWithStepFunc(DT,GoodIndex, maxclass,maxindex)
          else
-            clear plot_option
             GeosOnly2D(DT, GoodIndex, maxclass, maxindex, 1)
          end
          
       otherwise % No pause between maxima
          fprintf('\n')
-         clear plot_option
          GeosOnly2D(DT, GoodIndex, maxclass, maxindex, pause_option)
-         clear pause_option
    end
 end
 
