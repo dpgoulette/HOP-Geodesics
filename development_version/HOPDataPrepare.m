@@ -161,9 +161,7 @@ fprintf('\n')
 % returned will be a subset of the GoodEdges that is input.
 if alpha_option == 1
    % Then we don't need to calculate the alpha complex.
-   clear alpha_option
 else % We will HOP on an alpha complex 1-skeleton
-   clear alpha_option
    GoodEdges = AlphaCellsSelect(DT,GoodEdges,VV,VC,GoodIndex);
    fprintf('\nFinished selecting the alpha complex\n')
 end
