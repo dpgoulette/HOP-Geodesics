@@ -105,13 +105,16 @@ hop=struct('edges',{},'density',{},'maxclass',{},'minclass',{},...
    'maxedgesboundary',{},'minedgesboundary',{},'hopmaxpath',{},...
    'hopminpath',{});
 
+% % TEST SECTION FOR BUG FIX
+% GoodEdges = sort(GoodEdges,2);
+% GoodEdges = sortrows(GoodEdges,1);
+
 % Double the edges for sorting.  We want every edge expressed both ways in
 % the matrix for easy searching.
 Edges=GoodEdges;
 Edges=circshift(Edges,[0 1]);%flip the edges
 Edges=[GoodEdges;Edges];
 Edges=sortrows(Edges);% So E holds every edge expressed both ways.
-
 
 %%%%%% Original Scalar function %%%%%%%
 % Find the Voronoi cell volumes
