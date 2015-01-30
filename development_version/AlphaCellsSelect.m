@@ -1,4 +1,5 @@
-function alpha_complex = AlphaCellsSelect(DT,GoodEdges,VV,VC,GoodIndex)
+function [alpha_complex, edges_with_alpha_all] =...
+   AlphaCellsSelect(DT,GoodEdges, VV,VC,GoodIndex)
 % AlphaCellsSelect -- Selects a subset of the Delaunay 1-skeleton (i.e. the
 %     Delaunay graph) based on user input.  The resulting edges in the
 %     alpha complex will be returned.  The user can select one of the
@@ -17,13 +18,13 @@ function alpha_complex = AlphaCellsSelect(DT,GoodEdges,VV,VC,GoodIndex)
 %              GoodIndex - The "good points" in DT.X (points that arent on
 %                          the boundary of the data space.
 %     output:
-%              alpha_complex - k x 2 matrix with the edges that were
+%              alpha_complex - k by 2 matrix with the edges that were
 %                          selected.  These edges have an alpha value that
 %                          passed the threshold.
 %     
-%     Note! If you would like the function to return ALL of the edges along
-%     with the associated value of alpha for each edge, then use the
-%     AlphaOneCells2d or AlphaOneCells3d functions directly.
+%              edges_with_alpha_all - k by 3 matrix.  The first two columns
+%                          hold all of the edges from GoodEdges.  The third
+%                          column holds the alpha value for each edge.
 %
 %     These are the selection schemes available in this function (the code
 %     for these selection schemes can be found below the main function in
@@ -59,9 +60,9 @@ dimension = size(DT.X,2);
 % the edge in that row (the edge endpoints is is column 1 and 2).
 fprintf('Calculating alpha for the 1-cells.\n\n')
 if dimension == 2
-   edge_alpha = AlphaOneCells2d(DT,GoodEdges,VV,VC);
+   edges_with_alpha_all = AlphaOneCells2d(DT,GoodEdges,VV,VC);
 else
-   edge_alpha = AlphaOneCells3d(DT,GoodEdges,VV,VC);
+   edges_with_alpha_all = AlphaOneCells3d(DT,GoodEdges,VV,VC);
 end
 
 alpha_complex_option = 1;
@@ -114,13 +115,16 @@ while alpha_complex_option == 1;
    
    switch alpha_select_option
       case 1
-         [alpha_complex, keep_percent] = percentage_threshold(edge_alpha);
+         [alpha_complex, keep_percent] =...
+            percentage_threshold(edges_with_alpha_all);
          
       case 2
-         [alpha_complex, standard_devs] = st_dev_threshold(edge_alpha);
+         [alpha_complex, standard_devs] =...
+            st_dev_threshold(edges_with_alpha_all);
          
       otherwise % 3
-         alpha_complex = step_function_selection(edge_alpha, DT, GoodIndex);
+         alpha_complex =...
+            step_function_selection(edges_with_alpha_all,DT,GoodIndex);
    end
    
    %%%%%%%%%%%%%%%%%%%%%%%% END OF MAIN %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -176,7 +180,7 @@ end % main function -- AlphaCellsSelect
 %%%%%%%%%%%%%%%      DEPENDENT FUNCTIONS     %%%%%%%%%%%%%%%
 
 
-function [edge_alpha_trimmed, keep_percent] = percentage_threshold(edge_alpha)
+function [alpha_edges, keep_percent] = percentage_threshold(edge_alpha)
 
 % In this selection scheme we choose a global alpha threshold as a
 % percentage.  So, for example, .90 would keep the shortest 90% of
@@ -192,8 +196,8 @@ while true
    if keep_percent < 0 || keep_percent > 1
       fprintf('\nERROR: The number must be in the interval [0,1].\n')
    else
-      fprintf('\n\nSo the smallest %f percent of alpha values will be chosen.\n\n',...
-         keep_percent * 100)
+      fprintf('\n\nSo the smallest %f percent',keep_percent * 100)
+      fprintf(' of alpha values will be chosen.\n\n')
       pause(1)
       break
    end
@@ -209,25 +213,25 @@ num_keep = floor(size(edge_alpha,1) * keep_percent);
 % resort this matrix anyway.)
 if num_keep <= 0
    fprintf('\nAll edges will be removed!!\n')
-   edge_alpha_trimmed =[];
+   alpha_edges =[];
 elseif num_keep >= size(edge_alpha,1)
    fprintf('\nNOTE!\nNo edges will be deleted. This is the full Delaunay. ')
    fprintf('triangulation.\n')
    pause(1)
-   edge_alpha_trimmed = edge_alpha;
+   alpha_edges = edge_alpha(:, [1,2]);
 else
    % Delete the rows that don't pass the threshold cutoff.
    edge_alpha(num_keep + 1:end, :) = [];
    
    % Return the edges that passed the threshold.
    edge_alpha(:,3) = [];
-   edge_alpha_trimmed = edge_alpha(:, [1,2]);
+   alpha_edges = edge_alpha(:, [1,2]);
 end
 
 end % percentage_threshold
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-function [edge_alpha_trimmed, standard_devs] = st_dev_threshold(edge_alpha)
+function [alpha_edges, standard_devs] = st_dev_threshold(edge_alpha)
 % st_dev_threshold -- Removes the edges that have an alpha value larger
 %     than the user defined threshold.  This function prompts the user to
 %     enter a threshold, p, as a decimal percentage (number in
@@ -241,7 +245,7 @@ function [edge_alpha_trimmed, standard_devs] = st_dev_threshold(edge_alpha)
 %                     each edge. The third column holds the alpha value for
 %                     the edge in that row.
 %
-%        edge_alpha_trimmed - 
+%        alpha_edges - 
 
 fprintf('\nHow many standard deviations above the mean do you want')
 fprintf(' to keep? Entering a negative number will be below the mean.')
@@ -256,13 +260,13 @@ cutoff_start = find(edge_alpha(:,3) > cutoff, 1);
 
 if cutoff_start == 1
    fprintf('\nAll edges will be removed!! So evry point is isolated.\n')
-   edge_alpha_trimmed =[];
+   alpha_edges =[];
    pause(2)
    
 elseif isempty(cutoff_start)
    fprintf('\nNOTE!!!\nNo edges will be deleted. This is equivalent to')
    fprintf(' the full Delaunay.\n')
-   edge_alpha_trimmed = edge_alpha;
+   alpha_edges = edge_alpha(:, [1,2]);
    pause(2)
    
 else
@@ -270,7 +274,7 @@ else
    edge_alpha(cutoff_start:end,:) = [];
    
    % Return the edges that passed the threshold.
-   edge_alpha_trimmed = edge_alpha(:, [1,2]);
+   alpha_edges = edge_alpha(:, [1,2]);
    
 end
 
