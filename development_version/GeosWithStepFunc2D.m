@@ -1,4 +1,4 @@
-function GeosWithStepFunc(DT, GoodIndex, maxclass, maxindex)
+function GeosWithStepFunc2D(DT, GoodIndex, maxclass, maxindex)
 %  COMMENT THIS!!
 %
 % Loops through the maxima and plots the geodesics connected to that
