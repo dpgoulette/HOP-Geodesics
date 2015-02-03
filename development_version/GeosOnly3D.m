@@ -76,7 +76,7 @@ end
 
 figure
 points_plot3 = plot3(DT.X(GoodIndex,1), DT.X(GoodIndex,2),...
-   DT.X(GoodIndex,3),'k.');
+   DT.X(GoodIndex,3),'g.');
 axis equal
 hold on
 axis tight
@@ -91,7 +91,7 @@ if tree_option == 1
    hoptree_plot = plot3(X,Y,Z,'b:');
 end
 
-maxima_plot = plot3(DT.X(maxindex,1),DT.X(maxindex,2),DT.X(maxindex,3),'g.');
+maxima_plot = plot3(DT.X(maxindex,1),DT.X(maxindex,2),DT.X(maxindex,3),'b.');
 
 
 
@@ -130,7 +130,9 @@ for i=1:length(maxclass)
                Z=[DT.X(GeoEdges(:,1),3)';DT.X(GeoEdges(:,2),3)'];
                
                color_style = color_select(maxclass,i,j);
-               GeoPlotHandles1{j} = plot3(X,Y,Z,color_style);
+               if maxclass(i).geodesics{j,5} == 1
+                  GeoPlotHandles1{j} = plot3(X,Y,Z,color_style);
+               end
             end
          else % plot all geodesics
             % Plot this geodesic connected to the current max as long as it
@@ -144,7 +146,9 @@ for i=1:length(maxclass)
                Y=[DT.X(GeoEdges(:,1),2)';DT.X(GeoEdges(:,2),2)'];
                Z=[DT.X(GeoEdges(:,1),3)';DT.X(GeoEdges(:,2),3)'];
                color_style = color_select(maxclass,i,j);
-               GeoPlotHandles1{j} = plot3(X,Y,Z,color_style);
+               if maxclass(i).geodesics{j,5} == 3
+                  GeoPlotHandles1{j} = plot3(X,Y,Z,color_style);
+               end
             end
          end
          
@@ -168,11 +172,11 @@ end% main function
 function color_style = color_select(maxclass,i,j)
 %
 if maxclass(i).geodesics{j,5} == 1
-   color_style = 'm-';
+   color_style = 'k-';
 elseif maxclass(i).geodesics{j,5} == 2
-   color_style = 'm-';
+   color_style = 'g-';
 elseif maxclass(i).geodesics{j,5} == 3
-   color_style = 'm-';
+   color_style = 'r-';
 end
 end %color_select
 

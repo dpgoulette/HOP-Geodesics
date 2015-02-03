@@ -1,7 +1,25 @@
 % This is the main script to run the HOPGeodesics data model.  We first
-% list the current issues that need to be resolved.
-
+% list the planned improvements and current issues that need to be resolved.
+%
+% Planned:  
+%     - Create a tutorial version to explain our paper and research.  
+%           This version will go through each step in the process and plot
+%           everything step-by-step with explanations. Cover, delaunay,
+%           voronoi, hop, maxclasses, and alpha complexes.
+%
+%     - Split the main code into an interactive version that the user can
+%           play around with.  A second version will be for batch
+%           simulation.  The second version should be a function that takes
+%           parameters that set all of the different options.
+%
+%  
 % Issues:
+%
+%     - make fully modular.  Break out everything.  This will make
+%     development and management easier.  Code readability.
+%
+%     - fix comments for reruning with last_run_data struct. (here and
+%     HOPDataPrepare).
 %
 %     - AlphaOneCells3d and AlphaOneCells2d need comments and cleanup.
 %
@@ -45,8 +63,8 @@
 % whatever the name of your file holding your data array is.  The matrix
 % must be 2D or 3D data.
 
-% Data = load('3D_example.txt');
-Data = load('FlatDataExample.txt');
+Data = load('3D_example.txt');
+% Data = load('FlatDataExample.txt');
 
 % Prepare the raw data for HOP. Calculate the Delaunay triangulation and
 % the Voroinoi diagram.  Then throw away "bad" data on the boundary of the
@@ -102,16 +120,16 @@ if size(DT.X,2) == 3
    maxclass = GeoTetras(maxclass);
 end
 
-% The following is a temporary function.  It classifies each geodesic as
-% either being in a tetra, triangle, or only an isolated geodesic.  This
-% roughly means that the geodesic is a part of a 3D, 2D or 1D structure.
+% It classifies each geodesic as either being in a tetra, triangle, or only
+% an isolated geodesic.  This roughly means that the geodesic is a part of
+% a 3D, 2D or 1D structure.
 maxclass = geodesic_classify(maxclass);
 
 % Finished finding hop geodesics and related structures
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% save the main data structures that were calculated in a struct to speed
-% up rerunning the model.
+% save the important data structures that were calculated to speed up
+% rerunning the model.
 last_run_data = struct('DT', {DT}, 'VV', {VV}, 'VC', {VC},...
    'GoodIndex',{GoodIndex}, 'GoodEdges',{GoodEdges},...
    'edge_alpha',{edge_alpha});
