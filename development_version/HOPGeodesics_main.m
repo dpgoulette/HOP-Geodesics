@@ -14,9 +14,7 @@
 %
 %  
 % Issues:
-%
-%     - make fully modular.  Break out everything.  This will make
-%     development and management easier.  Code readability.
+
 %
 %     - fix comments for reruning with last_run_data struct. (here and
 %     HOPDataPrepare).
