@@ -13,6 +13,12 @@ Planned:
 Issues:
 
 
+    - Fix struct preallocation: hop, maxclass, minclass (where needed).
+
+    - Related to last issue: fix the assignment to the fields in
+    HOPClasses.  Unneeded preallocation (preassignment to a fields in not
+    needed if the array of structs is already initialized).
+
     - fix comments for reruning with last_run_data struct. (here and
     HOPDataPrepare).
 
@@ -40,12 +46,6 @@ Issues:
 
     - Fix the inner for loop in HOPStructCreate.  Too many hidden
     breakpoints. Should be a while loop.  Easier to read.
-
-    - Fix struct preallocation: hop, maxclass, minclass (where needed).
-
-    - Related to last issue: fix the assignment to the fields in
-    HOPClasses.  Unneeded preallocation (preassignment to a fields in not
-    needed if the array of structs is already initialized).
 
     - HOPClasses still finds the boundary and interior edges but this is
     still not well defined.  Consider revisiting and clarifying.
