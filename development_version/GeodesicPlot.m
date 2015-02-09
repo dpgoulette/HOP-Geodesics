@@ -37,7 +37,7 @@ else % The data is 2 dimensional
          fprintf('\n')
          
          if plot_option == 1
-            GeosWithStepFunc(DT,GoodIndex, maxclass,maxindex)
+            GeosWithStepFunc2D(DT,GoodIndex, maxclass,maxindex)
          else
             GeosOnly2D(DT, GoodIndex, maxclass, maxindex, 1)
          end

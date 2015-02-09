@@ -1,4 +1,4 @@
-function  Vols=vcellvolumes(V,C)
+function  Vols=vor_cell_volumes(V,C)
 % volumes - finds the volumes of the delaunay tetrahedra. Note that an
 %       important part of this script relies on the fact that the point at
 %       infinity is stored in the first entry in the cell.  

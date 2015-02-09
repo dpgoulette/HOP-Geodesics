@@ -1,0 +1,53 @@
+Planned:  
+    - Create a tutorial version to explain our paper and research.  
+          This version will go through each step in the process and plot
+          everything step-by-step with explanations. Cover, delaunay,
+          voronoi, hop, maxclasses, and alpha complexes.
+
+    - Split the main code into an interactive version that the user can
+          play around with.  A second version will be for batch
+          simulation.  The second version should be a function that takes
+          parameters that set all of the different options.
+
+ 
+Issues:
+
+
+    - fix comments for reruning with last_run_data struct. (here and
+    HOPDataPrepare).
+
+    - AlphaOneCells3d and AlphaOneCells2d need comments and cleanup.
+
+    - restructure the main and dependencies for clarity.  Push the user
+    questions into the functions where possible.  Have the main only save
+    the main data needed for data analysis.
+
+    - hopmaxconnect still uses
+    maxconnect internally.  It works but the code is not as simple as it
+    could be.  We possibly want to redo it to use only maxclass.
+
+    - GeoTris still creates a Geodesic_Tris cell that
+    we are no longer using.  (GeoTris is not returning this cell
+    currently.)  Consider removing this from the script.  Do everything
+    with the maxclass struct.
+
+    - GeoTetras still creates a cell for the tetras.  Same issue as the
+    previous issue.
+
+    - Need comments and cleanup throughout
+          hopmaxconnect
+          GeodesicPlot (and dependencies)
+
+    - Fix the inner for loop in HOPStructCreate.  Too many hidden
+    breakpoints. Should be a while loop.  Easier to read.
+
+    - Fix struct preallocation: hop, maxclass, minclass (where needed).
+
+    - Related to last issue: fix the assignment to the fields in
+    HOPClasses.  Unneeded preallocation (preassignment to a fields in not
+    needed if the array of structs is already initialized).
+
+    - HOPClasses still finds the boundary and interior edges but this is
+    still not well defined.  Consider revisiting and clarifying.
+
+

@@ -205,6 +205,29 @@ end
 
 end% maxconnect function
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%       ######  #     #  ####        #     #     #     #####  #     #
+%       #       ##    #  #   #       ##   ##    # #      #    ##    #
+%       #       # #   #  #    #      # # # #   #   #     #    # #   #
+%       ####    #  #  #  #    #      #  #  #  #######    #    #  #  #
+%       #       #   # #  #    #      #     #  #     #    #    #   # #
+%       #       #    ##  #   #       #     #  #     #    #    #    ##
+%       ######  #     #  ####        #     #  #     #  #####  #     #
+%
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%    DEPENDENT SUB-FUNCTION
+%            |   |
+%            |   |
+%          \       /
+%           \     /
+%            \   /
+%             \ /
+
 function [L, T] = Plength(P,X)
 % find the length of the longest edge in the path return that length as L.
 % Also return the lengths of all of the edges sorted return as T.

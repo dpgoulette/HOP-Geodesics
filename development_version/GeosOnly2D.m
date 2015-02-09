@@ -1,4 +1,4 @@
-function GeosOnly2D_edit(DT, GoodIndex, maxclass, maxindex, pause_option)
+function GeosOnly2D(DT, GoodIndex, maxclass, maxindex, pause_option)
 %  COMMENT THIS!!
 %
 %  GoodMaxGeodesics is unused and may be unneeded.  It comes from
@@ -149,6 +149,7 @@ for i=1:length(maxclass)
    end
 end
 
+% Plot the 2d patches in the 2d regions.
 for a = 1:length(maxclass)
    for b = 1:size(maxclass(a).geo_tris,1)
       if a == maxclass(a).geo_tris{b,2}(1)
