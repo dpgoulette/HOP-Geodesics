@@ -12,12 +12,8 @@ Planned:
  
 Issues:
 
-
-    - Fix struct preallocation: hop, maxclass, minclass (where needed).
-
-    - Related to last issue: fix the assignment to the fields in
-    HOPClasses.  Unneeded preallocation (preassignment to a fields in not
-    needed if the array of structs is already initialized).
+	- Now that I have preallocated the hop struct, make sure I am not 
+   initializing anything in other places: Gradient HOP function, etc.
 
     - fix comments for reruning with last_run_data struct. (here and
     HOPDataPrepare).
