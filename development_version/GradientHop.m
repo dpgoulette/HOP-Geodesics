@@ -10,7 +10,7 @@ function [maxpointer, minpointer, hop] = GradientHop(hop,GoodIndex,DT)
 %
 %
 %   Inputs:  
-%       hop       - the hop data structure
+%       hop       - the hop data structure.
 %       GoodIndex - the index of "good" points that are not on the boundary
 %                   of the data space.
 %       n         - the total number of points in the data set
@@ -20,14 +20,10 @@ function [maxpointer, minpointer, hop] = GradientHop(hop,GoodIndex,DT)
 maxpointer=NaN(length(DT.X),1);
 minpointer=NaN(length(DT.X),1);
 
-% Initialize each point as not being a max or a min.
-[hop(:).ismax]=deal(false);
-[hop(:).ismin]=deal(false);
-
-%find maximums; A max has density larger than any of it's neigbors. mark in
-%hop struct which points are maxs; create pointer list for the HOP paths;
-%there will be a NaN at an entry for a bad point. There will be an Inf if
-%the point is a max.
+% find maxima; A max has density larger than any of it's neigbors. mark in
+% hop struct which points are maxs; create pointer list for the HOP paths;
+% there will be a NaN at an entry for a bad point. There will be an Inf if
+% the point is a max.
 
 
 for i=1:length(GoodIndex)
