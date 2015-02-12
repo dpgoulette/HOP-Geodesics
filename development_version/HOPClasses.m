@@ -109,20 +109,27 @@ function [hop,maxclass,minclass] = HOPClasses(hop,maxindex,minindex,DT)
 %                                        currently.)
 
 
-% Create the maxclass and minclass structs with all fields.
-maxclass=struct('max',{},'points',{},...
-    'nbormax',{},'nbormaxid',{},'interiorv',{},'boundaryv',{},...
-    'interiore',{},'boundarye',{},'bonds',{},'hoptree',{},'geodesics',{},...
-    'geo_tris',{}, 'geo_tetras',{});
-minclass=struct('min',{},'points',{},...
-    'nbormin',{},'nborminid',{},'interiorv',{},'boundaryv',{},...
-    'interiore',{},'boundarye',{},'bonds',{},'hoptree',{});
 
-% Get the indices of the maxima and minima
+% Initialize the entries in the maxclass and minclass structs with all
+% fields.
+maxclass_temp=struct('max',[],'points',[],...
+    'nbormax',[],'nbormaxid',[],'interiorv',[],'boundaryv',[],...
+    'interiore',[],'boundarye',[],'bonds',[],'hoptree',[],'geodesics',[],...
+    'geo_tris',[], 'geo_tetras',[]);
+minclass_temp=struct('min',[],'points',[],...
+    'nbormin',[],'nborminid',[],'interiorv',[],'boundaryv',[],...
+    'interiore',[],'boundarye',[],'bonds',[],'hoptree',[]);
+
+% preallocate the maxclass and minclass structs
+maxclass = repmat(maxclass_temp,1,size(maxindex,1));
+minclass = repmat(minclass_temp,1,size(minindex,1));
+
+% Get the indices of all the maxima and minima
 M=vertcat(hop.maxclass);
 m=vertcat(hop.minclass);
 
-% Catalog the max/min point indices in their respective classes.  
+% Catalog the max/min point indices in their respective classes.  Also find
+% all points that hop to max i and store those points in maxclass(i).points
 for i=1:length(maxindex)
     maxclass(i).max=maxindex(i);
     maxclass(i).points=find(M==maxindex(i));
@@ -132,39 +139,40 @@ for i=1:length(minindex)
     minclass(i).points=find(m==minindex(i));
 end
 
-% Assign to each point in hop the index of it's max/min class.  That way
-% we can find out all of the information about a points class.
+% Assign to each point in hop the index of it's max/min class (not the
+% index of the max itself).  Then hop(i).maxclassid will hold the index into
+% the maxclass struct that represents the maxclass for i.  So we can always
+% retrieve the struct that holds i's maxclass by doing this:
+%     maxclass(hop(i).maxclassid)
 
-% Preallocate zeros.
-temp=0;
-[hop(:).maxclassid]=deal(temp);
-[hop(:).minclassid]=deal(temp);
-
-temp = zeros(length(DT.X),1);
-
-for i = 1:length(maxindex)
-    temp(maxindex(i))=i; 
+for i = 1:length(maxclass)
+   hop(maxclass(i).max).maxclassid = i;
 end
 
-% Assign the maxclass index to each point in hop
 for i = 1:length(hop)
-    if ~isnan(hop(i).maxclass)
-        hop(i).maxclassid = temp(hop(i).maxclass);
-    end
+   % Check that the point is not a bad point (it will have NaN for density)
+   % Also check that it is not a max (we have already done the maxima above).
+   if ~isnan(hop(i).density) && ~hop(i).ismax
+      % Get i's max.  They have the same maxclassid.  Assign it.
+      max_of_i = hop(i).maxclass;
+      hop(i).maxclassid = hop(max_of_i).maxclassid;
+   end
 end
 
-temp = zeros(length(DT.X),1);
-
-for i = 1:length(minindex)
-    temp(minindex(i))=i; 
+% Do the same for mins
+for i = 1:length(minclass)
+   hop(minclass(i).min).minclassid = i;
 end
 
-% Assign the minclass index to each point in hop
 for i = 1:length(hop)
-    if ~isnan(hop(i).minclass)
-        hop(i).minclassid = temp(hop(i).minclass);
-    end
+   if ~isnan(hop(i).density) && ~hop(i).ismin
+      % Get i's min.  They have the same minclassid.  Assign it.
+      min_of_i = hop(i).minclass;
+      hop(i).minclassid = hop(min_of_i).minclassid;
+   end
 end
+
+
 %%%%%%%%%%% done assigning max and min classes %%%%%%%%%%%%%%%%
 
 
@@ -184,9 +192,6 @@ end
 %      find the max class for the neighbors of k; 
 %           these max classes are the nbormax for the maxclass of k
 
-%deal false to hop.isboundaryM and m
-[hop.ismaxboundary]=deal(false);
-[hop.isminboundary]=deal(false);
 
 % For Max Classes
 for k=1:length(hop)
