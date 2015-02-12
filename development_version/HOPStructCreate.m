@@ -98,16 +98,18 @@ function [hop, maxindex, minindex] = HOPStructCreate(VV,VC,GoodEdges,...
 %
 %  COMMENTS: We are no longer using "interior edges" and "boundary edges."
 %  Consider removing.
-hop=struct('edges',{},'density',{},'maxclass',{},'minclass',{},...
-   'maxclassid',{},'minclassid',{},...
-   'ismax',{},'ismin',{},'ismaxboundary',{},'isminboundary',{},...
-   'maxedgesin',{},'minedgesin',{},'maxbonds',{},'minbonds',{},...
-   'maxedgesboundary',{},'minedgesboundary',{},'hopmaxpath',{},...
-   'hopminpath',{});
 
-% % TEST SECTION FOR BUG FIX
-% GoodEdges = sort(GoodEdges,2);
-% GoodEdges = sortrows(GoodEdges,1);
+% initialize a struct with all of the needed fields.  It is very important
+% for later code that 'density' is initialized with NaN.  This way, bad
+% points will ultimately have NaN as their density.
+hop_temp = struct('edges',[],'density',NaN,'maxclass',[],'minclass',[],...
+   'maxclassid',[],'minclassid',[],...
+   'ismax',false,'ismin',false,'ismaxboundary',false,'isminboundary',false,...
+   'maxedgesin',[],'minedgesin',[],'maxbonds',[],'minbonds',[],...
+   'maxedgesboundary',[],'minedgesboundary',[],'hopmaxpath',[],...
+   'hopminpath',[]);
+% preallocate the struct using hop_temp.
+hop = repmat(hop_temp,1,size(DT.X,1));
 
 % Double the edges for sorting.  We want every edge expressed both ways in
 % the matrix for easy searching.
@@ -118,17 +120,14 @@ Edges=sortrows(Edges);% So E holds every edge expressed both ways.
 
 %%%%%% Original Scalar function %%%%%%%
 % Find the Voronoi cell volumes
-DataVols=vor_cell_volumes(VV,VC);
+DataVols=vor_cell_volumes(VV,VC,GoodIndex);
 
-%density values 1/(volume of voronoi).
+% Density values:  1/(volume of voronoi).
 Densities=1./DataVols;
 
 % Assign to the third column of Edges the value of the density of the
 % point in the second column.
 Edges(:,3) = Densities(Edges(:,2));
-
-% deal nans to the density slot to prallocate the struct length
-[hop(1:size(DT.X,1)).density]=deal(NaN);
 
 fprintf('\nStarting to sort the edges for HOP.\n')
 
@@ -138,7 +137,7 @@ fprintf('\nStarting to sort the edges for HOP.\n')
 % based on the density of the neighbor which is in the third column of the
 % edges matrix.
 for a=1:length(GoodIndex)
-   r=Edges(:,1)==GoodIndex(a);
+   r = Edges(:,1) == GoodIndex(a);
    hop(GoodIndex(a)).edges=sortrows(Edges(r,:),3);
    
    % Progress at the terminal.
@@ -221,8 +220,9 @@ end
 % gradient.) The maxpointer and minpointer are n X 1 vectors contaning the
 % HOP pointers. So the i-th entry in maxpointer contains the index of the
 % point that the i-th point (in DT.X) hops to (it is the neigbor in the
-% direction of greatest gradient.  Maximuma and minumuma point to Inf.  Bad
-% points point to NaN.
+% direction of greatest gradient).  Maximuma and minumuma point to Inf.
+% Bad points point to NaN. Also, GradientHop marks assigns true to
+% hop(i).ismax if i is a max. Similar for mins.
 [maxpointer, minpointer, hop] = GradientHop(hop,GoodIndex,DT);
 
 fprintf('Done finding maxs, mins, and HOP path pointers.\n\n')

@@ -8,11 +8,6 @@ function maxclass = hopmaxconnect(points,maxclass,hop)
 %     on the full SDSS.) Speed up cataloging the reverse geodesic
 %     direction.  Avoid the "tempedges" matrix and the "ismember" call.
 %
-%
-%  COMPLETED THIS FIX (10/13) ==>  THIS FUNCTION CAN BE IMPROVED FOR SPEED.
-%     Instead of calculating the hop path, just pull it from
-%     hop(a).hopmaxpath.
-%
 % hopmaxconnectV2 - finds the geodesic path which connects two neighboring
 %       maxima.  Two maxima are neigbors if they share a bond edge, which
 %       means that they have points on their boundary that are adjacent in
@@ -71,7 +66,6 @@ for a=1:length(maxclass)
             Paths = cell(size(common_bonds,1),1);
             Plengths = zeros(size(common_bonds,1),1);
             
-            % TEST VERSION FOR TIE BREAKING
             % This cell will store the lengths of all the edges in all the
             % max paths.  We need them in case there is a tie for the
             % shortest maximum edge length.
@@ -116,7 +110,8 @@ for a=1:length(maxclass)
                % max-edge length, so store the geodesic in the maxconnect and
                % maxclass structures
                maxconnect{k,2}=Paths{id};
-               maxconnect{k,1}([1 2])= [maxconnect{k,2}(1),maxconnect{k,2}(end)];
+               maxconnect{k,1}([1 2])= ...
+                  [maxconnect{k,2}(1),maxconnect{k,2}(end)];
                maxclass(a).geodesics{b,1} = Paths{id};
                maxclass(a).geodesics{b,2} = maxconnect{k,1};
             else
@@ -139,12 +134,11 @@ for a=1:length(maxclass)
                   r = Temp ~= tie_breaker;
                   slots_with_min(r) = [];
                end
-%                maxconnect{k,1}(3) = min_length;
-%                [maxconnect{k,1}(3), id]=min(Plengths);%minimum max edge length path.
                
                % Store the geodesic in maxconnect and maxclass
                maxconnect{k,2}=Paths{slots_with_min};
-               maxconnect{k,1}([1 2])= [maxconnect{k,2}(1),maxconnect{k,2}(end)];
+               maxconnect{k,1}([1 2])=...
+                  [maxconnect{k,2}(1),maxconnect{k,2}(end)];
                maxclass(a).geodesics{b,1} = Paths{slots_with_min};
                maxclass(a).geodesics{b,2} = maxconnect{k,1};
             end
@@ -193,6 +187,11 @@ SortTemp(2:2:end,2)=1:size(SortTemp,1)/2;
 SortTemp=sortrows(SortTemp,1);
 maxconnect(:,3)=num2cell(SortTemp(:,2));
 
+
+% This is a patch for a design change.  We are no longer using the
+% maxconnect struct but the above code uses it.  So this block assigns the
+% contents of maxconnect to the appropriate slots in the maxclass struct.
+% In the futrue we will fix the above code.
 GeoIndex = 1;
 for i = 1:length(maxclass)
    if ~isempty(maxclass(i).nbormax)
