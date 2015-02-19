@@ -19,6 +19,10 @@ This code requires raw 2d or 3d data spatial data.  Two sample data sets are inc
 
 This code requires a version of MATLAB that has the TriRep class.  Specifically, you need the DelaunayTri subclass.  This is needed to create the Delaunay triangulation of the data as well as the Voronoi cells.
 
+For more details on the code, see the comments in the code files.  We are preparing a paper that will explain the theory behind the model.
+
+
+
 
 
 
