@@ -17,8 +17,6 @@ This code requires raw 2d or 3d data spatial data.  Two sample data sets are inc
 |8| maxclass | An array of structs that is as long as the number of maxclasses.  The maxclasses are a partition of the data space that results from appling the HOP algorithm.  The fields in this array of structs hold key information about each maxclass. |
 |9| minclass | Similar to maxclass. |
 
-9. minclass -- Similar to maxclass.
-
 This code requires a version of MATLAB that has the TriRep class.  Specifically, you need the DelaunayTri subclass.  This is needed to create the Delaunay triangulation of the data as well as the Voronoi cells.
 
 
